@@ -4,7 +4,9 @@
 
 **▶ Try it online:** [ekidio.github.io/padeki](https://ekidio.github.io/padeki/)
 
-![PADEKI – CLASSIC skin](screenshots/padeki-classic.png)
+[![Watch the demo video (39 s, with sound)](screenshots/padeki-demo-poster.jpg)](https://ekidio.github.io/padeki/media/padeki-demo.mp4)
+
+**[▶ Demo video](https://ekidio.github.io/padeki/media/padeki-demo.mp4)** · 39 s, with sound
 
 **PADEKI** is a single-file, browser-based pad sampler and step sequencer in the spirit of classic MPC-style groove boxes. Load a loop onto the TAPE, chop it, put the slices on pads and program your beat. You can play it with the mouse, the computer keyboard or a USB MIDI pad controller.
 

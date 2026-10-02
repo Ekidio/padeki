@@ -4,7 +4,9 @@
 
 **▶ Kipróbálható online:** [ekidio.github.io/padeki](https://ekidio.github.io/padeki/)
 
-![PADEKI – CLASSIC skin](screenshots/padeki-classic.png)
+[![Nézd meg a demóvideót (39 mp, hanggal)](screenshots/padeki-demo-poster.jpg)](https://ekidio.github.io/padeki/media/padeki-demo.mp4)
+
+**[▶ Demóvideó](https://ekidio.github.io/padeki/media/padeki-demo.mp4)** · 39 mp, hanggal
 
 A **PADEKI** egyetlen HTML fájlból álló, böngészőben futó padsampler és step sequencer, a klasszikus MPC-szerű groove-boxok szellemében. Betöltesz egy loopot a TAPE-re, felszeleteled, a szeleteket padokra teszed, és beprogramozod a ritmust. Egérrel, a számítógép billentyűzetével vagy USB-s MIDI pad kontrollerrel is játszhatsz rajta.
 
