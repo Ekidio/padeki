@@ -1843,13 +1843,22 @@ function loopToSlicePad() {
   const t = T(), buf = tapeBuf(); if (!t.src || !buf) return;
   const a = t.a, b = t.b, sl = [a, ...t.marks.filter(m => m > a + 0.0005 && m < b - 0.0005)];
   if (sl.length < 2) { toast('Chop the TAPE first (AUTO / 4 / 8 / 16), then LOOP → SLICE PAD', 2200); return; }
-  const i = !S.pads[S.sel].src && (S.sel >> 4) === S.bank ? S.sel : S.pads.findIndex((p, k) => (k >> 4) === S.bank && !p.src);
-  if (i < 0) { toast('No empty pad in this bank'); return; }
+  // a pad shown on the TAPE (EDITING PAD …) is turned into the slice pad itself; otherwise the selected empty pad or the first empty one
+  const sel = S.pads[S.sel], selSame = sel.src && sameSrc(sel.src, t.src);           // the selected pad already holds this sample → slice that pad
+  const inPlace = (UI.link != null && S.pads[UI.link]?.src) || selSame;
+  let i = UI.link != null && S.pads[UI.link]?.src ? UI.link : selSame ? S.sel : !sel.src ? S.sel : -1;
+  if (i < 0) {                                                      // a different sound is selected: replace it (after asking) or use the first empty pad
+    const free = S.pads.findIndex((p, k) => (k >> 4) === S.bank && !p.src);
+    if (confirm(`LOOP → SLICE PAD: replace ${padLabel2(S.sel)} (${sel.name}) with the sliced loop?` + (free >= 0 ? `\n\nCancel = put it on the empty pad ${padLabel2(free)} instead.` : ''))) i = S.sel;
+    else if (free >= 0) i = free;
+    else return;
+  }
+  const keep = inPlace ? { name: S.pads[i].name, p: { ...S.pads[i].p }, dt: S.pads[i].dt, choke: S.pads[i].choke } : null;
   const len = (b - a) * buf.duration, bar = 240 / S.bpm;
   const bars = [1, 2, 4].reduce((best, n) => Math.abs(Math.log(len / (n * bar))) < Math.abs(Math.log(len / (best * bar))) ? n : best, 1), steps = bars * 16;
   const slSteps = sl.map(x => Math.round((x - a) / (b - a) * steps));
   for (let k = 1; k < slSteps.length; k++) if (slSteps[k] <= slSteps[k - 1]) slSteps[k] = slSteps[k - 1] + 1;   // two slices never on one step
-  Object.assign(S.pads[i], newPad(), { src: JSON.parse(JSON.stringify(t.src)), a, b, name: t.name.slice(0, 12), sl, slSteps, slLen: Math.max(steps, slSteps[slSteps.length - 1] + 1) });
+  Object.assign(S.pads[i], newPad(), { src: JSON.parse(JSON.stringify(t.src)), a, b, name: t.name.slice(0, 12), sl, slSteps, slLen: Math.max(steps, slSteps[slSteps.length - 1] + 1) }, keep || {});
   fillSliceRow(i); S.sel = i;
   dirty(); renderPads(); renderSeq(); renderKnobs();
   toast(`${sl.length} slices → ${padLabel2(i)} · loop = ${bars} bar${bars > 1 ? 's' : ''} (≈ ${(bars * 240 / len).toFixed(1)} BPM) · plays at any tempo`, 3200);
