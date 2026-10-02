@@ -26,7 +26,8 @@ PADEKI is part of the DAWEKI family ([DAWEKI V3](https://github.com/Ekidio/dawek
 ### PADS
 - **8 banks (A–H) × 16 pads**, each showing its own waveform. Use **LOAD KIT** for the built-in kits and **CLEAR** to empty a bank.
 - **PAD EDITOR** (long-press or right-click a pad):
-  - TUNE, DECAY, FILTER, LOW CUT, DRIVE, VOLUME, PAN, REVERB and DELAY
+  - TUNE, DECAY, FILTER, LOW CUT, DRIVE, DIST, VOLUME, PAN, REVERB and DELAY
+  - **DIST** creative distortion with three types: **FUZZ** (hard clip), **FOLD** (metallic wavefolder) and **CRUSH** (lo-fi bit reduction)
   - REVERSE and CHOKE groups
   - COPY / PASTE and rename
 - **KEYS ♪**: play one sound chromatically.
@@ -46,7 +47,7 @@ PADEKI is part of the DAWEKI family ([DAWEKI V3](https://github.com/Ekidio/dawek
 - Swing, metronome, count-in and live recording from the pads, the keyboard or MIDI.
 
 ### Mix, export and projects
-- **MASTER FX**: reverb and tempo-synced delay sends, master volume and limiter.
+- **MASTER FX**: reverb and a tempo-synced **ping-pong delay** (echoes bounce left ↔ right, adjustable width), master volume and limiter.
 - **EXPORT WAV** renders the pattern chain ×1 / ×2 / ×4 / ×8, in one of two modes:
   - **LOOP**: exact length, with the reverb or delay tail wrapped to the start so the file loops seamlessly.
   - **+ TAIL**: adds the ring-out at the end.
@@ -54,7 +55,7 @@ PADEKI is part of the DAWEKI family ([DAWEKI V3](https://github.com/Ekidio/dawek
 - **Web MIDI input** for 16-pad controllers (notes 36–51 → pads 1–16), plus MIDI start / stop.
 
 ### Four skins
-**MENU → LOOK & CLICK**: CLASSIC, ICE, MODERN, ANALOG.
+**MENU → LOOK & CLICK**: CLASSIC, ICE, MODERN (default) and ANALOG.
 
 | CLASSIC | ICE |
 |---|---|
@@ -64,8 +65,8 @@ PADEKI is part of the DAWEKI family ([DAWEKI V3](https://github.com/Ekidio/dawek
 
 ## Quick start
 1. Open [the web app](https://ekidio.github.io/padeki/), or download `index.html` and open it in your browser.
-2. Click the blinking **LOAD KIT ▾** and pick a kit. Or drop your own loop onto the TAPE.
-3. Click the cells in the grid to write a beat, then press **▶** or **Space**.
+2. The **demo project** loads on start: press **▶** or **Space** and it plays right away.
+3. Click the cells in the grid to change the beat. Use **LOAD KIT ▾** for another kit, or the blinking **LOAD** to put your own loop on the TAPE.
 4. Drop a drum loop on the TAPE, press **AUTO**, then **LOOP → SLICE PAD**. Your loop now follows the project tempo.
 5. Use **MENU → EXPORT WAV** or **SAVE** when you're done.
 

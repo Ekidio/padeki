@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>PADEKI V2</title>
 <script>/* PADEKI V1 is always the CLASSIC machine; ICE = blue variant */
-(function(){var t='classic';try{t=localStorage.getItem('padeki2-theme')||t;}catch(e){}var d=document.documentElement;d.dataset.theme='classic';if(t==='ice'||t==='modern'||t==='analog')d.dataset.variant=t;})();</script>
+(function(){var t='modern';try{t=localStorage.getItem('padeki2-theme')||t;}catch(e){}var d=document.documentElement;d.dataset.theme='classic';if(t==='ice'||t==='modern'||t==='analog')d.dataset.variant=t;})();</script>
 <style>@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wght@1,800;1,900&family=Bungee&family=Sedgwick+Ave+Display&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
 
 /* =====================================================================
@@ -647,7 +647,7 @@ body.sending .shead{outline:2px solid #48b336;outline-offset:-2px;cursor:copy}
 .seqhead .bars .bgap{background:none}
 .seqhead .bars span{white-space:nowrap;overflow:visible}
 
-.knobs8{grid-template-columns:repeat(9,1fr)}
+.knobs8{grid-template-columns:repeat(10,1fr)}
 .sheet .box{max-width:860px}
 
 /* KEYS sheet */
@@ -656,7 +656,7 @@ body.sending .shead{outline:2px solid #48b336;outline-offset:-2px;cursor:copy}
 .ksrow .seg{display:flex;gap:4px;flex-wrap:wrap}
 .rootbox{min-width:112px;padding:8px 10px;text-align:center;font:800 15px var(--mono);border-radius:8px;background:linear-gradient(var(--lcd-a),var(--lcd-b));color:var(--lcd-ink)}
 /* LOAD KIT = accent key (red on CLASSIC, blue on ICE) */
-.bankrow .btn.kit,.btn.kit{background:linear-gradient(color-mix(in srgb,var(--red) 88%,#fff),var(--red));color:#fff;border-color:color-mix(in srgb,var(--red) 70%,#000);text-shadow:0 1px 0 rgba(0,0,0,.25)}
+.bankrow .btn.kit,.tapebar .btn.kit,.btn.kit{background:linear-gradient(color-mix(in srgb,var(--red) 88%,#fff),var(--red));color:#fff;border-color:color-mix(in srgb,var(--red) 70%,#000);text-shadow:0 1px 0 rgba(0,0,0,.25)}
 .btn.kit:hover{filter:brightness(1.08)}
 .btn.kit:active{filter:brightness(.92)}
 
@@ -779,7 +779,7 @@ html[data-variant="analog"] .brand .br{background:#d9342b;box-shadow:3px 3px 0 #
 html[data-variant="analog"] .brand .bl{background:linear-gradient(90deg,#1b2533,transparent)}
 html[data-variant="analog"] .kh .pname:focus{background:#000;color:#fff}
 html[data-variant="analog"] select{background:linear-gradient(#3a3c40,#1c1d20);color:#f2f3f5;border-color:#000}
-html[data-variant="analog"] .btn.kit,html[data-variant="analog"] .bankrow .btn.kit{color:#fff}
+html[data-variant="analog"] .btn.kit,html[data-variant="analog"] .bankrow .btn.kit,html[data-variant="analog"] .tapebar .btn.kit{color:#fff}
 
 /* ---------- MODERN: pocket sampler ---------- */
 html[data-variant="modern"]{
@@ -815,7 +815,7 @@ html[data-variant="modern"] .slot.cur{background:linear-gradient(#ff7a45,#f04a10
 html[data-variant="modern"] .tbtn.rec{background:linear-gradient(#ff7a45,#f04a10);color:#fff;border-color:#c43a08;box-shadow:0 3px 0 #b8380a,0 4px 6px rgba(0,0,0,.2)}
 html[data-variant="modern"] .tbtn.play{background:linear-gradient(#7a7a7c,#5c5c5e);color:#fff;border-color:#3a3a3c;box-shadow:0 3px 0 #2e2e30,0 4px 6px rgba(0,0,0,.2)}
 html[data-variant="modern"] .tbtn.play.on{background:linear-gradient(#5fe39a,#23b26a);color:#03200d}
-html[data-variant="modern"] .btn.kit,html[data-variant="modern"] .bankrow .btn.kit{color:#fff;border-color:#c43a08;box-shadow:0 3px 0 #b8380a,0 4px 6px rgba(0,0,0,.2)}
+html[data-variant="modern"] .btn.kit,html[data-variant="modern"] .bankrow .btn.kit,html[data-variant="modern"] .tapebar .btn.kit{color:#fff;border-color:#c43a08;box-shadow:0 3px 0 #b8380a,0 4px 6px rgba(0,0,0,.2)}
 /* screens: black glass */
 html[data-variant="modern"] .lcdbtn{border:2px solid #0b0b0c;border-radius:5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 1px 0 #fff}
 html[data-variant="modern"] .lcdbtn small{color:#ff7a45}
@@ -844,6 +844,8 @@ html[data-variant="modern"] .brand .bl{background:linear-gradient(90deg,#ff5a1f,
 html[data-variant="modern"] .kh .pname:focus{background:#fff;color:#2a2a2b}
 html[data-variant="modern"] select{background:linear-gradient(#f2f1ee,#dcdbd7);color:#2a2a2b;border-color:#a9a8a3}
 html[data-variant="modern"] input[type=range]::-webkit-slider-runnable-track{background:linear-gradient(90deg,#ff5a1f var(--p,0%),#2a2a2b var(--p,0%));border-color:#a9a8a3}
+.kf.distrow{margin-top:8px;flex-wrap:wrap;align-items:center}
+.kf.distrow .slinfo{font:700 10.5px var(--mono);color:#77777a;margin-left:8px}
 </style>
 </head>
 <body>
@@ -865,7 +867,7 @@ html[data-variant="modern"] input[type=range]::-webkit-slider-runnable-track{bac
     <div class="tapebar">
       <span class="tt" id="tapeTitle">TAPE</span><span class="info" id="tapeInfo"></span>
       <select id="recentSel"></select>
-      <button class="btn" data-a="loadTape">LOAD</button><span class="sep"></span>
+      <button class="btn kit" id="tapeLoadBtn" data-a="loadTape">LOAD</button><span class="sep"></span>
       <span class="tt">CHOP</span><button class="btn" data-a="chop" data-n="auto">AUTO</button><button class="btn" data-a="chop" data-n="4">4</button><button class="btn" data-a="chop" data-n="8">8</button><button class="btn" data-a="chop" data-n="16">16</button><button class="btn" data-a="chop" data-n="clear">✕</button><button class="btn on" id="headsBtn" data-a="heads" title="show which slice / where the pads play on the TAPE while the pattern runs">PLAYHEADS</button><button class="btn" id="hitBtn" data-a="hitMode" title="click the wave: markers on the hit before and after the click (Alt+click works any time)">✚ HIT</button>
       <span class="tt" title="move every slice marker together">SHIFT ALL</span><button class="btn" data-a="shiftMarks" data-d="-5">◀◀ 5ms</button><button class="btn" data-a="shiftMarks" data-d="-1">◀ 1ms</button><button class="btn" data-a="shiftMarks" data-d="1">1ms ▶</button><button class="btn" data-a="shiftMarks" data-d="5">5ms ▶▶</button>
       <span class="sep"></span><button class="btn" data-a="fillPads">FILL EMPTY PADS</button><button class="btn" data-a="toPad">SELECTION → FREE PAD</button><button class="btn slbtn" data-a="loopSlice" title="the whole selection on ONE pad, sliced at the markers (like ReCycle / REX) – its row plays the slices, at any tempo">LOOP → SLICE PAD</button>
@@ -1726,6 +1728,7 @@ const KNOBS = [
   { k: 'cut', label: 'FILTER', min: 0, max: 1, def: 1, fmt: v => v >= 0.995 ? 'OPEN' : (h => h >= 1000 ? (h / 1000).toFixed(1) + 'k' : Math.round(h) + '')(cutHz(v)) },
   { k: 'lo', label: 'LOW CUT', min: 0, max: 1, def: 0, fmt: v => v <= 0.005 ? 'OFF' : (h => h >= 1000 ? (h / 1000).toFixed(1) + 'k' : Math.round(h) + ' Hz')(loHz(v)) },
   { k: 'drive', label: 'DRIVE', min: 0, max: 1, def: 0, fmt: pctF },
+  { k: 'dist', label: 'DIST', min: 0, max: 1, def: 0, fmt: v => v <= 0.005 ? 'OFF' : Math.round(v * 100) + '%' },
   { k: 'vol', label: 'VOLUME', min: 0, max: 1, def: 0.8, fmt: pctF },
   { k: 'pan', label: 'PAN', min: -1, max: 1, def: 0, fmt: v => Math.abs(v) < 0.02 ? 'C' : (v < 0 ? 'L' : 'R') + Math.round(Math.abs(v) * 100) },
   { k: 'rev', label: 'REVERB', min: 0, max: 1, def: 0, fmt: pctF },
@@ -1747,13 +1750,13 @@ const LANES = [
 function lockSet(n, k, v) { n.L = n.L || {}; n.L[k] = v; }
 function lockDel(n, k) { if (n.L) { delete n.L[k]; if (!Object.keys(n.L).length) delete n.L; } }
 
-const newPad = () => ({ name: '', src: null, a: 0, b: 1, p: { ...KDEF }, rv: false, choke: 0, fine: 0, key: null, sl: null, lsl: 0, slSteps: null, slLen: 0, mute: false, solo: false });   // every field listed, so replacing a pad resets KEYS / SLICE leftovers
+const newPad = () => ({ name: '', src: null, a: 0, b: 1, p: { ...KDEF }, rv: false, choke: 0, fine: 0, key: null, dt: 'fuzz', sl: null, lsl: 0, slSteps: null, slLen: 0, mute: false, solo: false });   // every field listed, so replacing a pad resets KEYS / SLICE leftovers
 const newSlot = () => ({ bars: 1, notes: [] });
 function defaultState() {
   return { v: 1, bpm: 120, swing: 50, metro: false, countIn: true, metroVol: 0.6, bank: 0, sel: 0, slot: 0, chain: [0], lane: 'step',
     pads: Array.from({ length: NPAD }, newPad), slots: Array.from({ length: NSLOT }, newSlot),
     tape: { src: null, name: '', a: 0, b: 1, marks: [] }, recent: [], bankKeys: BANKS.map(() => null),
-    master: { vol: 0.85, limiter: true }, fxb: { revLvl: 0.8, revTime: 2.2, dlyLvl: 0.7, dlyDiv: 2, dlyFb: 0.35, dlyTone: 4500 },
+    master: { vol: 0.85, limiter: true }, fxb: { revLvl: 0.8, revTime: 2.2, dlyLvl: 0.7, dlyDiv: 2, dlyFb: 0.35, dlyTone: 4500, dlyW: 1 },
     midi: { enabled: false, in: '', inCh: 0, syncIn: true } };
 }
 let S = defaultState(), userSamples = {};
@@ -1786,17 +1789,42 @@ function makeGraph(c, out) {
   G.pre = c.createDelay(0.2); G.pre.delayTime.value = 0.015;
   G.conv = c.createConvolver(); G.conv.buffer = makeIR(c, S.fxb.revTime); G.irTime = S.fxb.revTime;
   G.revRet = c.createGain(); G.revIn.connect(G.pre).connect(G.conv).connect(G.revRet).connect(out);
-  G.dl = c.createDelay(4); G.fb = c.createGain(); G.tone = filt(c, 'lowpass', S.fxb.dlyTone, 0.5); G.dlyRet = c.createGain();
-  G.dlyIn.connect(G.dl); G.dl.connect(G.tone); G.tone.connect(G.fb); G.fb.connect(G.dl); G.tone.connect(G.dlyRet); G.dlyRet.connect(out);
+  // PING-PONG: mono in → left delay → right delay → left … each echo jumps to the other side
+  G.dlyMono = c.createGain(); G.dlyMono.channelCount = 1; G.dlyMono.channelCountMode = 'explicit';
+  G.dl = c.createDelay(4); G.dl2 = c.createDelay(4); G.fb = c.createGain(); G.fb2 = c.createGain();
+  G.tone = filt(c, 'lowpass', S.fxb.dlyTone, 0.5); G.tone2 = filt(c, 'lowpass', S.fxb.dlyTone, 0.5);
+  G.panL = c.createStereoPanner(); G.panR = c.createStereoPanner(); G.dlyRet = c.createGain();
+  G.dlyIn.connect(G.dlyMono).connect(G.dl);
+  G.dl.connect(G.tone); G.tone.connect(G.panL).connect(G.dlyRet); G.tone.connect(G.fb).connect(G.dl2);
+  G.dl2.connect(G.tone2); G.tone2.connect(G.panR).connect(G.dlyRet); G.tone2.connect(G.fb2).connect(G.dl);
+  G.dlyRet.connect(out);
   G.out = out; applyGraph(G); return G;
 }
 function applyGraph(G) {
   const c = G.c, t = c.currentTime, set = (prm, v) => c instanceof OfflineAudioContext ? prm.setValueAtTime(v, 0) : prm.setTargetAtTime(v, t, 0.02);
   set(G.revRet.gain, S.fxb.revLvl); set(G.dlyRet.gain, S.fxb.dlyLvl);
-  set(G.dl.delayTime, DLY_DIVS[S.fxb.dlyDiv][1] * 60 / S.bpm); set(G.fb.gain, S.fxb.dlyFb); set(G.tone.frequency, S.fxb.dlyTone);
+  const dt = DLY_DIVS[S.fxb.dlyDiv][1] * 60 / S.bpm, w = S.fxb.dlyW ?? 1;
+  set(G.dl.delayTime, dt); set(G.dl2.delayTime, dt);
+  set(G.fb.gain, S.fxb.dlyFb); set(G.fb2.gain, S.fxb.dlyFb);   // echo 1 left, echo 2 right (× feedback), echo 3 left …
+  set(G.tone.frequency, S.fxb.dlyTone); set(G.tone2.frequency, S.fxb.dlyTone);
+  set(G.panL.pan, -w); set(G.panR.pan, w);
 }
 let irT = 0;
 function refreshIR() { clearTimeout(irT); irT = setTimeout(() => { if (A.G.irTime !== S.fxb.revTime) { A.G.conv.buffer = makeIR(ctx, S.fxb.revTime); A.G.irTime = S.fxb.revTime; } }, 250); }
+/* DIST: FUZZ (asymmetric hard clip), FOLD (wavefolder – metallic / synthy), CRUSH (bit reduction – lo-fi steps) */
+const DIST_TYPES = [['fuzz', 'FUZZ'], ['fold', 'FOLD'], ['crush', 'CRUSH']];
+const distCurves = {};
+function distCurve(type, d) {
+  const k = Math.round(d * 40) / 40, key = type + k; if (distCurves[key]) return distCurves[key];
+  const n = 4096, c = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const x = i / (n - 1) * 2 - 1;
+    if (type === 'fold') c[i] = Math.sin(x * Math.PI / 2 * (1 + k * 9));
+    else if (type === 'crush') { const L = Math.pow(2, Math.max(1, Math.round(12 - k * 11)) - 1); c[i] = Math.round(x * L) / L; }
+    else { const g = 1 + k * 60; c[i] = x >= 0 ? Math.tanh(g * x) : Math.tanh(g * 0.55 * x) * 0.75; }
+  }
+  return distCurves[key] = c;
+}
 const driveCurves = {};
 const driveCurve = d => { const k = Math.round(d * 20) / 20; return driveCurves[k] || (driveCurves[k] = satCurve(1 + k * 8)); };
 function padBuffer(pd) {
@@ -1856,6 +1884,7 @@ function playPad(c, G, i, note, t, chk, live) {
   else { g.gain.setValueAtTime(amp, Math.max(t, end - 0.004)); g.gain.linearRampToValueAtTime(0, end); }
   src.connect(g); let node = g;
   if (P.drive > 0.01) { const ws = c.createWaveShaper(); ws.curve = driveCurve(P.drive); const dg = c.createGain(); dg.gain.value = 1 / (1 + P.drive * 1.5); node.connect(ws).connect(dg); node = dg; }
+  if (P.dist > 0.005) { const t = pd.dt || 'fuzz', ws = c.createWaveShaper(); ws.curve = distCurve(t, P.dist); ws.oversample = t === 'crush' ? 'none' : '2x'; const dg = c.createGain(); dg.gain.value = t === 'fuzz' ? 0.55 : t === 'fold' ? 0.75 : 0.9; node.connect(ws).connect(dg); node = dg; }
   if (cut < 0.995) { const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = cutHz(cut); f.Q.value = 0.9; node.connect(f); node = f; }
   if (P.lo > 0.005) { const f = c.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = loHz(P.lo); f.Q.value = 0.7; node.connect(f); node = f; }
   if (Math.abs(pan) > 0.01) { const pn = c.createStereoPanner(); pn.pan.value = pan; node.connect(pn); node = pn; }
@@ -2473,6 +2502,7 @@ function renderTapeInfo() {
 }
 function renderTape() {
   const hb = $('#headsBtn'); if (hb) hb.classList.toggle('on', S.tapeHeads !== false);
+  $('#tapeLoadBtn')?.classList.toggle('blink', !tapeBuf());          // empty TAPE: LOAD calls for attention like LOAD KIT
   $('#tapeTitle').innerHTML = UI.link != null ? `EDITING PAD <b>${padLabel2(UI.link)}</b> · ${esc(S.pads[UI.link].name)}` : `TAPE · <b>${esc(S.tape.name || 'EMPTY')}</b>`;
   $('#recentSel').innerHTML = `<option value="">RECENT…</option>` + S.recent.map((r, k) => `<option value="${k}">${esc(r.name)}</option>`).join('');
   renderTapeInfo(); requestAnimationFrame(drawTape);
@@ -2558,6 +2588,7 @@ function renderKnobs() {
     <div class="kf"><button class="btn ${pd.rv ? 'on' : ''}" data-a="rv">REVERSE</button><span class="lbl">CHOKE</span>${[0, 1, 2, 3, 4].map(g => `<button class="btn ${pd.choke === g ? 'on' : ''}" data-a="choke" data-g="${g}">${g || 'OFF'}</button>`).join('')}
       <span class="grow" style="flex:1"></span><button class="btn" data-a="copyPad">COPY</button><button class="btn" data-a="pastePad" ${UI.padClip ? '' : 'disabled'}>PASTE</button>
       <button class="btn" data-a="spread" ${pd.src ? '' : 'disabled'} title="play this sound like a keyboard: root detection, 16 pads chromatic, piano keys">KEYS ♪</button><button class="btn" data-a="clearPad">CLEAR</button></div>
+    <div class="kf distrow"><span class="lbl">DIST TYPE</span>${DIST_TYPES.map(([id, nm]) => `<button class="btn ${(pd.dt || 'fuzz') === id ? 'on' : ''}" data-a="distType" data-t="${id}">${nm}</button>`).join('')}<span class="slinfo">turn the DIST knob · FUZZ = hard clip · FOLD = metallic wavefold · CRUSH = lo-fi bits</span></div>
     ${sliceRow(pd)}
     <svg width="0" height="0" style="position:absolute"><defs><radialGradient id="kg" cx="40%" cy="35%"><stop offset="0" stop-color="#fdfdfb"/><stop offset="1" stop-color="#c9c8c2"/></radialGradient></defs></svg>`;
 }
@@ -2663,7 +2694,7 @@ function knobUp(e) { if (!KN || e.pointerId !== KN.id) return; KN = null; UI.kno
 function selectPad(i) { const was = S.sel; S.sel = i; if ((i >> 4) !== S.bank) { S.bank = i >> 4; renderPads(); renderSeq(); } else { document.querySelectorAll('.pad2.sel,.shead.sel').forEach(x => x.classList.remove('sel')); document.querySelectorAll(`.pad2[data-i="${i}"],.shead[data-i="${i}"]`).forEach(x => x.classList.add('sel')); applySeqZoom(); } if (was !== i) renderKnobs(); }
 function openSheet(title, html) { $('#sheetBox').innerHTML = `<div class="sh"><b>${title}</b><button class="btn sm sq" data-a="closeSheet">✕</button></div>${html}`; $('#sheet').classList.add('show'); }
 function closeSheet() { $('#sheet').classList.remove('show'); }
-const FMT = { ksFine: v => (v > 0 ? '+' : '') + Math.round(v) + ' ct', mvol: pctF, revLvl: pctF, dlyLvl: pctF, revTime: v => (+v).toFixed(1) + ' s', dlyFb: pctF, dlyTone: v => v >= 1000 ? (v / 1000).toFixed(1) + 'k' : Math.round(v) + ' Hz', swing: v => Math.round(v) + '%', metroVol: pctF };
+const FMT = { dlyW: v => Math.round(v * 100) + '%', ksFine: v => (v > 0 ? '+' : '') + Math.round(v) + ' ct', mvol: pctF, revLvl: pctF, dlyLvl: pctF, revTime: v => (+v).toFixed(1) + ' s', dlyFb: pctF, dlyTone: v => v >= 1000 ? (v / 1000).toFixed(1) + 'k' : Math.round(v) + ' Hz', swing: v => Math.round(v) + '%', metroVol: pctF };
 function rng(label, k, min, max, step, val, log) {
   const pos = log ? Math.log(val / min) / Math.log(max / min) : val, pct = log ? pos * 100 : (val - min) / (max - min) * 100;
   return `<label class="rng"><span class="rl">${label}</span><input type="range" data-k="${k}" ${log ? `data-log="${min},${max}" min="0" max="1" step="0.001"` : `min="${min}" max="${max}" step="${step}"`} value="${pos}" style="--p:${pct}%"><span class="val">${FMT[k] ? FMT[k](val) : val}</span></label>`;
@@ -2703,9 +2734,9 @@ function menuSheet() {
 function fxSheet() {
   openSheet('MASTER & FX', `<div class="sheetgrid"><div class="card"><h3>MASTER</h3>${rng('Volume', 'mvol', 0, 1.2, 0.01, S.master.vol)}<button class="btn ${S.master.limiter ? 'on' : ''}" style="width:100%" data-a="limiter">LIMITER</button></div>
     <div class="card"><h3>BUS REVERB</h3>${rng('Level', 'revLvl', 0, 1.5, 0.01, S.fxb.revLvl)}${rng('Size', 'revTime', 0.3, 6, 0.1, S.fxb.revTime)}</div>
-    <div class="card" style="grid-column:1/-1"><h3>BUS DELAY</h3>${rng('Level', 'dlyLvl', 0, 1.5, 0.01, S.fxb.dlyLvl)}
+    <div class="card" style="grid-column:1/-1"><h3>BUS DELAY · PING-PONG</h3>${rng('Level', 'dlyLvl', 0, 1.5, 0.01, S.fxb.dlyLvl)}
       <div class="ksrow"><span>Time</span><div class="seg">${DLY_DIVS.map(([nm], k) => `<button class="btn sm ${S.fxb.dlyDiv === k ? 'on' : ''}" data-a="dlyDiv" data-n="${k}">${nm}</button>`).join('')}</div></div>
-      ${rng('Feedback', 'dlyFb', 0, 0.9, 0.01, S.fxb.dlyFb)}${rng('Tone', 'dlyTone', 500, 16000, 0, S.fxb.dlyTone, true)}</div></div>
+      ${rng('Feedback', 'dlyFb', 0, 0.9, 0.01, S.fxb.dlyFb)}${rng('Width', 'dlyW', 0, 1, 0.01, S.fxb.dlyW ?? 1)}${rng('Tone', 'dlyTone', 500, 16000, 0, S.fxb.dlyTone, true)}</div></div>
     <p class="hint">Per pad: REVERB and DELAY knobs send the pad into these.</p>`);
 }
 const ACT = {
@@ -2797,6 +2828,7 @@ const ACT = {
   unlink: () => { UI.link = null; renderTape(); },
   showOnTape: () => showPadOnTape(S.sel),
   rename: () => { const pd = S.pads[S.sel], nm = prompt('Pad name', pd.name); if (nm == null) return; pd.name = nm.slice(0, 16).toUpperCase(); dirty(); renderPads(); renderSeq(); renderKnobs(); },
+  distType: el => { const pd = S.pads[S.sel]; pd.dt = el.dataset.t; if (pd.p.dist < 0.05) pd.p.dist = 0.5; dirty(); renderKnobs(); ensureAudio(); playPad(ctx, A.G, S.sel, { v: 110 }, ctx.currentTime, liveChoke, true); },
   rv: () => { const pd = S.pads[S.sel]; pd.rv = !pd.rv; dirty(); renderKnobs(); drawPadThumb(S.sel); },
   choke: el => { S.pads[S.sel].choke = +el.dataset.g; dirty(); renderKnobs(); },
   copyPad: () => { UI.padClip = JSON.parse(JSON.stringify(S.pads[S.sel])); toast('Pad copied'); renderKnobs(); },
@@ -2939,7 +2971,7 @@ async function boot() {
   bootJingle(); buildAudio(); bindUI(); bootStep(0.1, 'starting…');
 
   try { const saved = await idb2.get('autosave'); if (saved?.state?.pads?.some(p => p?.src)) await idb2.set('lastsession', saved); } catch (e) { console.warn(e); }   // every start = clean sheet, the old one stays restorable
-  bootStep(0.4, 'generating drums…');
+  bootStep(0.4, 'generating drums…'); await applyDemo();               // every start = the DEMO project, so it plays right away
   await Promise.all(['808', '909', 'dusty', 'trap'].map(ensureKit));
   bootStep(0.95, 'almost there…'); renderAll(); requestAnimationFrame(uiLoop);
   if (S.midi.enabled && navigator.requestMIDIAccess) midiEnable(true);

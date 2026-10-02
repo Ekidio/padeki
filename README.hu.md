@@ -26,7 +26,8 @@ A PADEKI a DAWEKI család tagja ([DAWEKI V3](https://github.com/Ekidio/daweki_v3
 ### PADOK
 - **8 bank (A–H) × 16 pad**, mindegyiken a saját hullámformájával. **LOAD KIT** a beépített kitekhez, **CLEAR** a bank kiürítéséhez.
 - **PAD EDITOR** (hosszú nyomás vagy jobb klikk a padon):
-  - TUNE, DECAY, FILTER, LOW CUT, DRIVE, VOLUME, PAN, REVERB és DELAY
+  - TUNE, DECAY, FILTER, LOW CUT, DRIVE, DIST, VOLUME, PAN, REVERB és DELAY
+  - **DIST** kreatív torzító, három típussal: **FUZZ** (kemény vágás), **FOLD** (fémes hullámhajtogatás) és **CRUSH** (lo-fi bitcsökkentés)
   - REVERSE és CHOKE csoportok
   - COPY / PASTE és átnevezés
 - **KEYS ♪**: egy hangot kromatikusan játszhatsz.
@@ -46,7 +47,7 @@ A PADEKI a DAWEKI család tagja ([DAWEKI V3](https://github.com/Ekidio/daweki_v3
 - Swing, metronóm, előszámlálás és élő felvétel a padokról, a billentyűzetről vagy MIDI-ről.
 
 ### Keverés, export, projektek
-- **MASTER FX**: reverb és tempóra szinkronizált delay küldés, master hangerő és limiter.
+- **MASTER FX**: reverb és tempóra szinkronizált **ping-pong delay** (a visszhangok bal ↔ jobb pattognak, állítható szélesség), master hangerő és limiter.
 - Az **EXPORT WAV** a pattern-láncot ×1 / ×2 / ×4 / ×8 hosszban menti, kétféle módban:
   - **LOOP**: pontos hossz, a lecsengés az elejére kerül, így a fájl hézag nélkül loopol.
   - **+ TAIL**: a végén kicsenghet a hang.
@@ -54,7 +55,7 @@ A PADEKI a DAWEKI család tagja ([DAWEKI V3](https://github.com/Ekidio/daweki_v3
 - **Web MIDI bemenet** 16 pados kontrollerekhez (36–51-es hangok → 1–16. pad), plusz MIDI start / stop.
 
 ### Négy skin
-**MENU → LOOK & CLICK**: CLASSIC, ICE, MODERN, ANALOG.
+**MENU → LOOK & CLICK**: CLASSIC, ICE, MODERN (alapértelmezett) és ANALOG.
 
 | CLASSIC | ICE |
 |---|---|
@@ -64,8 +65,8 @@ A PADEKI a DAWEKI család tagja ([DAWEKI V3](https://github.com/Ekidio/daweki_v3
 
 ## Gyors kezdés
 1. Nyisd meg a [webes alkalmazást](https://ekidio.github.io/padeki/), vagy töltsd le az `index.html` fájlt, és nyisd meg a böngészőben.
-2. Kattints a villogó **LOAD KIT ▾** gombra, és válassz egy kitet. Vagy húzd rá a saját loopodat a TAPE-re.
-3. Kattintgass a grid celláira, aztán **▶** vagy **Szóköz**.
+2. Indításkor betöltődik a **demó projekt**: nyomd meg a **▶**-t vagy a **Szóközt**, és azonnal szól.
+3. A grid celláira kattintva módosíthatod a ritmust. Másik kithez **LOAD KIT ▾**, a saját loopodhoz a villogó **LOAD** a TAPE-en.
 4. Húzz egy dob-loopot a TAPE-re, majd **AUTO**, aztán **LOOP → SLICE PAD**. A loopod ezután a projekt tempóját követi.
 5. Ha kész vagy: **MENU → EXPORT WAV** vagy **SAVE**.
 
