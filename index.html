@@ -846,6 +846,7 @@ html[data-variant="modern"] select{background:linear-gradient(#f2f1ee,#dcdbd7);c
 html[data-variant="modern"] input[type=range]::-webkit-slider-runnable-track{background:linear-gradient(90deg,#ff5a1f var(--p,0%),#2a2a2b var(--p,0%));border-color:#a9a8a3}
 .kf.distrow{margin-top:8px;flex-wrap:wrap;align-items:center}
 .kf.distrow .slinfo{font:700 10.5px var(--mono);color:#77777a;margin-left:8px}
+.sc.cur{outline:2px solid var(--red);outline-offset:-1px;z-index:1}
 </style>
 </head>
 <body>
@@ -1858,7 +1859,7 @@ function loopToSlicePad() {
   const bars = [1, 2, 4].reduce((best, n) => Math.abs(Math.log(len / (n * bar))) < Math.abs(Math.log(len / (best * bar))) ? n : best, 1), steps = bars * 16;
   const slSteps = sl.map(x => Math.round((x - a) / (b - a) * steps));
   for (let k = 1; k < slSteps.length; k++) if (slSteps[k] <= slSteps[k - 1]) slSteps[k] = slSteps[k - 1] + 1;   // two slices never on one step
-  Object.assign(S.pads[i], newPad(), { src: JSON.parse(JSON.stringify(t.src)), a, b, name: t.name.slice(0, 12), sl, slSteps, slLen: Math.max(steps, slSteps[slSteps.length - 1] + 1) }, keep || {});
+  Object.assign(S.pads[i], newPad(), { src: JSON.parse(JSON.stringify(t.src)), a, b, name: t.name.slice(0, 12), sl, slSteps, slLen: Math.max(steps, slSteps[slSteps.length - 1] + 1), slEnd: b }, keep || {});
   fillSliceRow(i); S.sel = i;
   dirty(); renderPads(); renderSeq(); renderKnobs();
   toast(`${sl.length} slices → ${padLabel2(i)} · loop = ${bars} bar${bars > 1 ? 's' : ''} (≈ ${(bars * 240 / len).toFixed(1)} BPM) · plays at any tempo`, 3200);
@@ -2249,7 +2250,7 @@ function assignToPad(i, src, a, b, name) {
 function showPadOnTape(i) {
   const pd = S.pads[i]; if (!pd.src) return;
   setTape(pd.src, pd.name || padLabel2(i), pd.a, pd.b, i);
-  if (pd.sl) { S.tape.marks = [...pd.sl]; drawTape(); renderTapeInfo(); }
+  if (pd.sl) { S.tape.marks = [...pd.sl]; if (pd.slEnd != null) S.tape.b = pd.slEnd; drawTape(); renderTapeInfo(); }
 }
 const tapeMinSpan = () => { const b = tapeBuf(); return b ? Math.min(1, 0.02 / b.duration) : 0.01; };
 function tapeView(v0, span) { span = clamp(span, tapeMinSpan(), 1); v0 = clamp(v0, 0, 1 - span); UI.v0 = v0; UI.v1 = v0 + span; drawTape(); UI.headsDrawn = true; }
@@ -2391,6 +2392,7 @@ function setSelEdge(edge, v) {
   } else {
     const hi = isSlice && k + 2 < m.length ? m[k + 2] - gap : 1;
     t.b = clamp(v, t.a + gap, hi); if (isSlice && k + 1 < m.length) m[k + 1] = t.b;
+    else if (isSlice && S.pads[UI.link]?.sl) S.pads[UI.link].slEnd = t.b;   // OUT of the last slice = end of the slice-pad loop
   }
 }
 const NUDGE_LBL = { '-5': '◀◀ 5ms', '-1': '◀ 1ms', '1': '1ms ▶', '5': '5ms ▶▶' };
@@ -2425,7 +2427,22 @@ function sendToPad(i) {
 }
 function renderSelBar() { const el = $('#selBar'); if (el) el.innerHTML = selInfoHtml(); }
 function tapeX(e) { const r = $('#tapeCv').getBoundingClientRect(), fx = clamp((e.clientX - r.left) / r.width, 0, 1); return { r: UI.v0 + fx * (UI.v1 - UI.v0), px: r.width, y: e.clientY - r.top, h: r.height }; }
-function linkedUpdate() { if (UI.link == null) return; const pd = S.pads[UI.link]; pd.a = S.tape.a; pd.b = S.tape.b; drawPadThumb(UI.link); dirty(); }
+function linkedUpdate() {
+  if (UI.link == null) return; const pd = S.pads[UI.link];
+  if (pd.sl) syncSlicePad(pd);                                        // slice pad: the TAPE markers ARE its slice starts, the selection never shrinks the loop
+  else { pd.a = S.tape.a; pd.b = S.tape.b; }
+  drawPadThumb(UI.link); dirty();
+}
+/* slice pad on the TAPE: slice starts follow the markers; the loop end and the notes in the grid stay where they are */
+function syncSlicePad(pd) {
+  const end = pd.slEnd ?? (pd.slEnd = 1), m = [...S.tape.marks].sort((x, y) => x - y).filter(x => x < end - 0.0005);
+  if (!m.length) return;
+  pd.a = m[0]; pd.b = end > m[m.length - 1] ? end : 1; pd.sl = m;
+  if (pd.slSteps?.length !== m.length) {                              // a marker added / removed: new grid places for writing (→ ROW)
+    const steps = pd.slLen || 16; pd.slSteps = m.map(x => Math.round((x - pd.a) / (pd.b - pd.a) * steps));
+    for (let k = 1; k < pd.slSteps.length; k++) if (pd.slSteps[k] <= pd.slSteps[k - 1]) pd.slSteps[k] = pd.slSteps[k - 1] + 1;
+  }
+}
 function tapeDown(e) {
   if (!e.target.closest('#tapeCv') || !tapeBuf()) return;
   e.preventDefault(); ensureAudio();
@@ -2622,11 +2639,12 @@ function renderSeq() {
       const n = row[s], beat = Math.floor(s / 4) % 2 === 0, bar = s > 0 && s % 16 === 0;
       if (bar) cells += gap;
       const snum = n && pd.sl ? `<em>${(n.L?.slice ?? 0) + 1}</em>` : '';
-      if (S.lane === 'step' || !n || (lane.id === 'slice' && !pd.sl)) { cells += `<div class="sc ${beat ? 'beat' : ''} ${bar ? 'bar' : ''} ${n ? 'on' : ''}" data-p="${i}" data-s="${s}" ${n ? `style="--v:${((n.v || 100) / 127).toFixed(2)}"` : ''}>${snum}</div>`; continue; }
+      const curC = UI.cur && UI.cur.p === i && UI.cur.s === s ? 'cur' : '';   // the cell Cmd/Ctrl + arrows work on (can be empty)
+      if (S.lane === 'step' || !n || (lane.id === 'slice' && !pd.sl)) { cells += `<div class="sc ${curC} ${beat ? 'beat' : ''} ${bar ? 'bar' : ''} ${n ? 'on' : ''}" data-p="${i}" data-s="${s}" ${n ? `style="--v:${((n.v || 100) / 127).toFixed(2)}"` : ''}>${snum}</div>`; continue; }
       const [lmin, lmax] = lane.range ? lane.range(pd) : [lane.min, lane.max];
       const v = lane.get(n, pd), f = clamp((v - lmin) / (lmax - lmin), 0, 1), locked = lane.locked ? lane.locked(n) : (lane.id === 'pitch' ? !!n.L?.pitch : false);
       const bar2 = lane.bip ? `<div class="bar bip ${locked ? 'locked' : ''}" style="top:${f >= 0.5 ? (1 - f) * 100 : 50}%;height:${Math.max(3, Math.abs(f - 0.5) * 100)}%"></div>` : `<div class="bar ${locked ? 'locked' : ''}" style="height:${Math.max(4, f * 100)}%"></div>`;
-      cells += `<div class="sc lane on ${beat ? 'beat' : ''} ${bar ? 'bar' : ''}" data-p="${i}" data-s="${s}">${bar2}${lane.id === 'slice' ? snum : ''}</div>`;
+      cells += `<div class="sc lane on ${curC} ${beat ? 'beat' : ''} ${bar ? 'bar' : ''}" data-p="${i}" data-s="${s}">${bar2}${lane.id === 'slice' ? snum : ''}</div>`;
     }
     const quiet = pd.src && !audible(i);
     h += `<div class="srow ${quiet ? 'quiet' : ''}"><div class="shead ${i === S.sel ? 'sel' : ''} ${pd.src ? '' : 'empty'}" data-i="${i}" style="--c:${padCol(i)}"><i></i><span>${padLabel2(i).slice(1)} ${pd.src ? esc(pd.name) : '—'}</span>${pd.src ? `<b class="ms"><button class="m ${pd.mute ? 'on' : ''}" data-a="mute" data-i="${i}" title="mute">M</button><button class="s ${pd.solo ? 'on' : ''}" data-a="solo" data-i="${i}" title="solo (shift+click: only this one)">S</button></b>` : ''}</div><div class="scells" style="${cols};--c:${padCol(i)}">${cells}</div></div>`;
@@ -2669,9 +2687,33 @@ function seqApply(c, e) {
   lane.set(n, lmin + f * (lmax - lmin));
   if (lane.id === 'slice' && lane.get(n) !== before && !P.playing) playPad(ctx, A.G, p, n, ctx.currentTime, liveChoke, true);   // hear the slice you pick
 }
+/* Cmd/Ctrl + ↑/↓: step the value of the current note in the DRAW lane (STEP lane = velocity); Cmd/Ctrl + ←/→: previous / next note of the row */
+function laneNudge(code, fine, repeat) {
+  const len = curSlot().bars * SPB;
+  if (!UI.cur || UI.cur.s >= len) UI.cur = { p: S.sel, s: 0 }; else if (UI.cur.p !== S.sel) UI.cur = { p: S.sel, s: UI.cur.s };   // keep the column when the row changes
+  if (code === 'ArrowLeft' || code === 'ArrowRight') {                 // step cell by cell along the row (wraps around the pattern)
+    UI.cur = { p: S.sel, s: (UI.cur.s + (code === 'ArrowRight' ? 1 : -1) + len) % len }; renderSeq();
+    const m = noteAt(UI.cur.p, UI.cur.s); if (m && !P.playing) { ensureAudio(); playPad(ctx, A.G, m.p, m, ctx.currentTime, liveChoke, true); }
+    return;
+  }
+  const n = noteAt(UI.cur.p, UI.cur.s);
+  if (!n) { toast(`Step ${Math.floor(UI.cur.s / 16) + 1}.${UI.cur.s % 16 + 1} is empty – click it (STEP) to add a note`, 1400); return; }
+  const pd = S.pads[n.p], preview = () => { if (!P.playing) { ensureAudio(); playPad(ctx, A.G, n.p, n, ctx.currentTime, liveChoke, true); } };
+  const id = S.lane === 'step' ? 'vel' : S.lane, lane = LANES.find(x => x.id === id);
+  if (id === 'slice' && !pd.sl) { toast('SLICE: only on a slice pad (LOOP → SLICE PAD)'); return; }
+  const [mn, mx] = lane.range ? lane.range(pd) : [lane.min, lane.max];
+  const step = id === 'vel' ? (fine ? 1 : 5) : id === 'pitch' || id === 'slice' ? 1 : (mx - mn) * (fine ? 0.01 : 0.05);
+  if (!repeat) pushUndo();                                              // one UNDO step per key press (held key = one step)
+  lane.set(n, clamp(lane.get(n, pd) + (code === 'ArrowUp' ? step : -step), mn, mx));
+  UI.cur = { p: n.p, s: n.s }; dirty(); renderSeq(); preview();
+  const v = lane.get(n, pd), shown = id === 'slice' ? v + 1 : id === 'pitch' ? (v > 0 ? '+' : '') + v + ' st' : id === 'vel' ? v
+    : id === 'pan' ? (Math.abs(v) < 0.02 ? 'C' : (v < 0 ? 'L' : 'R') + Math.round(Math.abs(v) * 100)) : Math.round((v - mn) / (mx - mn) * 100) + '%';
+  toast(`${lane.label} ${shown} · step ${Math.floor(n.s / 16) + 1}.${n.s % 16 + 1}`, 900);
+}
 function seqDown(e) {
   const c = e.target.closest('#seq .sc'); if (!c) return;
   e.preventDefault(); ensureAudio(); pushUndo();
+  UI.cur = { p: +c.dataset.p, s: +c.dataset.s };                       // the note that Cmd/Ctrl + arrows edit
   SQ = { id: e.pointerId, done: new Set(), mode: S.lane === 'step' ? (noteAt(+c.dataset.p, +c.dataset.s) ? 'erase' : 'add') : 'draw' };
   if (e.detail === 2 && S.lane !== 'step') { const n = noteAt(+c.dataset.p, +c.dataset.s); if (n) LANES.find(x => x.id === S.lane).reset(n); SQ = null; dirty(); renderSeq(); return; }
   seqApply(c, e); seqSoon();
@@ -2791,7 +2833,7 @@ const ACT = {
     else if (n === 'clear') t.marks = [];
     else t.marks = Array.from({ length: +n }, (_, k) => k / +n);
     UI.selSeg = null;
-    UI.shiftMs = 0;
+    UI.shiftMs = 0; if (S.pads[UI.link]?.sl) linkedUpdate();
     dirty(); renderTapeInfo(); drawTape();
   },
   fillPads: () => {
@@ -2828,7 +2870,7 @@ const ACT = {
   shiftMarks: el => {
     const t = T(), buf = tapeBuf(); if (!buf || t.marks.length < 2) { toast('Chop the TAPE first (AUTO / 4 / 8 / 16)'); return; }
     const d = +el.dataset.d / 1000 / buf.duration, segs = segments(), selSeg = segs.findIndex(([a, b]) => Math.abs(a - t.a) < 1e-9 && Math.abs(b - t.b) < 1e-9);
-    t.marks = t.marks.map(m => clamp(m + d, 0, 1));
+    t.marks = t.marks.map(m => clamp(m + d, 0, 1)); linkedUpdate();
     UI.shiftMs = (UI.shiftMs || 0) + +el.dataset.d;
     if (selSeg >= 0) { const ns = segments()[selSeg]; t.a = ns[0]; t.b = ns[1]; tapePlay(t.a, t.b); }
     dirty(); renderTapeInfo(); drawTape();
@@ -2948,10 +2990,11 @@ function bindUI() {
   // computer keyboard
   document.addEventListener('keydown', e => {
     if (e.target.classList?.contains('pname') && e.key === 'Enter') { e.target.blur(); return; }
+    if ((e.metaKey || e.ctrlKey) && /^Arrow(Up|Down|Left|Right)$/.test(e.code) && !e.target.closest?.('input,select,textarea')) { e.preventDefault(); laneNudge(e.code, e.shiftKey, e.repeat); return; }
     if (e.target.closest?.('input,select,textarea') || e.metaKey || e.ctrlKey) return;
     if (e.code === 'Escape' && UI.send) { setSend(false); return; }
     if ((e.code === 'ArrowLeft' || e.code === 'ArrowRight') && tapeBuf()) { e.preventDefault(); ACT.selNudge({ dataset: { d: String((e.code === 'ArrowLeft' ? -1 : 1) * (e.shiftKey ? 5 : 1)) } }); return; }
-    if (e.code === 'ArrowUp' || e.code === 'ArrowDown') { e.preventDefault(); const r = clamp(S.sel - S.bank * 16 + (e.code === 'ArrowUp' ? -1 : 1), 0, 15); selectPad(S.bank * 16 + r); $(`#seq .shead[data-i="${S.sel}"]`)?.scrollIntoView({ block: 'nearest' }); return; }
+    if (e.code === 'ArrowUp' || e.code === 'ArrowDown') { e.preventDefault(); const r = clamp(S.sel - S.bank * 16 + (e.code === 'ArrowUp' ? -1 : 1), 0, 15); selectPad(S.bank * 16 + r); if (UI.cur) { UI.cur = { p: S.sel, s: UI.cur.s }; renderSeq(); } $(`#seq .shead[data-i="${S.sel}"]`)?.scrollIntoView({ block: 'nearest' }); return; }
     if (e.code === 'Space') { e.preventDefault(); P.playing ? stop() : play(); return; }
     const kb = S.bankKeys[S.bank];
     if (kb) {

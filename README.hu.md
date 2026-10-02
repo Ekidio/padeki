@@ -76,6 +76,8 @@ A PADEKI a DAWEKI család tagja ([DAWEKI V3](https://github.com/Ekidio/daweki_v3
 | `Szóköz` | Lejátszás / stop |
 | `1 2 3 4` · `Q W E R` · `A S D F` · `Y X C V` | 13–16. · 9–12. · 5–8. · 1–4. pad |
 | `↑ / ↓` | Előző / következő sor a gridben |
+| `Cmd/Ctrl + ← / →` | Cellánkénti léptetés a soron belül |
+| `Cmd/Ctrl + ↑ / ↓` (Shift = finom) | A kijelölt cella hangjának értéke a választott DRAW sávban (SLICE, PITCH, VEL …) |
 | `← / →` (Shift = 5 ms) | A kijelölt szeletél igazítása a TAPE-en |
 | `Esc` | A szeletek padra küldésének leállítása |
 

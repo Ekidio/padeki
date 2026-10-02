@@ -76,6 +76,8 @@ PADEKI is part of the DAWEKI family ([DAWEKI V3](https://github.com/Ekidio/dawek
 | `Space` | Play / stop |
 | `1 2 3 4` · `Q W E R` · `A S D F` · `Z/Y X C V` | Pads 13–16 · 9–12 · 5–8 · 1–4 |
 | `↑ / ↓` | Previous / next row in the grid |
+| `Cmd/Ctrl + ← / →` | Move the cell cursor along the row |
+| `Cmd/Ctrl + ↑ / ↓` (Shift = fine) | Step the value of the note under the cursor in the selected DRAW lane (SLICE, PITCH, VEL …) |
 | `← / →` (Shift = 5 ms) | Nudge the selected slice edge on the TAPE |
 | `Esc` | Stop sending slices to pads |
 
