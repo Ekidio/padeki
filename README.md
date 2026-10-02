@@ -26,7 +26,7 @@ PADEKI is part of the DAWEKI family ([DAWEKI V3](https://github.com/Ekidio/dawek
 ### PADS
 - **8 banks (A–H) × 16 pads**, each showing its own waveform. Use **LOAD KIT** for the built-in kits and **CLEAR** to empty a bank.
 - **PAD EDITOR** (long-press or right-click a pad):
-  - TUNE, DECAY, FILTER, LOW CUT, DRIVE, DIST, VOLUME, PAN, REVERB and DELAY
+  - TUNE, DECAY, FILTER, LOW CUT, **EQ FREQ / EQ GAIN** (1-band bell EQ, ±15 dB), DRIVE, DIST, VOLUME, PAN, REVERB and DELAY
   - **DIST** creative distortion with three types: **FUZZ** (hard clip), **FOLD** (metallic wavefolder) and **CRUSH** (lo-fi bit reduction)
   - REVERSE and CHOKE groups
   - COPY / PASTE and rename
@@ -40,7 +40,7 @@ PADEKI is part of the DAWEKI family ([DAWEKI V3](https://github.com/Ekidio/dawek
 
 ### Sequencer
 - 8 patterns (**A–H**), each 1–4 bars of 16 steps. Chain patterns with **Shift-click**.
-- **DRAW** lanes for per-note values: STEP, VEL, PITCH, FILTER, DECAY, PAN, SLICE, REVERB and DELAY.
+- **DRAW** lanes for per-note values: STEP, VEL, PITCH, FILTER, DECAY, EQ FREQ, EQ GAIN, PAN, SLICE, REVERB and DELAY.
 - **⤢ ZOOM** makes the selected row as tall as a pad. **↑ / ↓** step between rows.
 - **M / S** (mute / solo) on every row. **🎲 RANDOM** writes a new rhythm for the bank, and **🎲 ROW** for a single row (on a slice pad it shuffles the slices).
 - **DOUBLE**, **COPY →**, **CLEAR** and **UNDO**.

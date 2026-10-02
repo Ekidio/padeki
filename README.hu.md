@@ -26,7 +26,7 @@ A PADEKI a DAWEKI család tagja ([DAWEKI V3](https://github.com/Ekidio/daweki_v3
 ### PADOK
 - **8 bank (A–H) × 16 pad**, mindegyiken a saját hullámformájával. **LOAD KIT** a beépített kitekhez, **CLEAR** a bank kiürítéséhez.
 - **PAD EDITOR** (hosszú nyomás vagy jobb klikk a padon):
-  - TUNE, DECAY, FILTER, LOW CUT, DRIVE, DIST, VOLUME, PAN, REVERB és DELAY
+  - TUNE, DECAY, FILTER, LOW CUT, **EQ FREQ / EQ GAIN** (1 sávos harang EQ, ±15 dB), DRIVE, DIST, VOLUME, PAN, REVERB és DELAY
   - **DIST** kreatív torzító, három típussal: **FUZZ** (kemény vágás), **FOLD** (fémes hullámhajtogatás) és **CRUSH** (lo-fi bitcsökkentés)
   - REVERSE és CHOKE csoportok
   - COPY / PASTE és átnevezés
@@ -40,7 +40,7 @@ A PADEKI a DAWEKI család tagja ([DAWEKI V3](https://github.com/Ekidio/daweki_v3
 
 ### Sequencer
 - 8 pattern (**A–H**), mindegyik 1–4 ütem, ütemenként 16 lépéssel. Láncolás **Shift + kattintással**.
-- **DRAW** sávok a hangonkénti értékekhez: STEP, VEL, PITCH, FILTER, DECAY, PAN, SLICE, REVERB és DELAY.
+- **DRAW** sávok a hangonkénti értékekhez: STEP, VEL, PITCH, FILTER, DECAY, EQ FREQ, EQ GAIN, PAN, SLICE, REVERB és DELAY.
 - A **⤢ ZOOM** a kijelölt sort pad-magasra nagyítja, a **↑ / ↓** a sorok között léptet.
 - **M / S** (némítás / szóló) minden soron. A **🎲 RANDOM** új ritmust ír a bankra, a **🎲 ROW** csak egy sorra (slice padon a szeleteket keveri).
 - **DOUBLE**, **COPY →**, **CLEAR** és **UNDO**.
