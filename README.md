@@ -17,7 +17,7 @@ PADEKI is part of the DAWEKI family ([DAWEKI V3](https://github.com/Ekidio/dawek
 ## Features
 
 ### TAPE: the sample editor
-- Drop an audio file onto the TAPE (or use **LOAD**). Zoom with the wheel and set the selection with the **IN / OUT** handles.
+- Drop an audio file onto the TAPE (or use **LOAD**): WAV, MP3, M4A, FLAC, OGG and **AIFF** (Logic / Pro Tools bounces). Zoom with the wheel and set the selection with the **IN / OUT** handles.
 - **CHOP**: **AUTO** puts a marker on every transient, or split the loop into **4 / 8 / 16** equal slices.
 - **+HIT / Alt-click** adds markers on the hits around the click. Use **SHIFT ALL** and the **IN / OUT ±1 / 5 ms** buttons for sample-accurate trimming.
 - **→ PAD**: click a slice, then click a pad. Or use **FILL EMPTY PADS** and **SELECTION → FREE PAD**.
@@ -40,10 +40,14 @@ PADEKI is part of the DAWEKI family ([DAWEKI V3](https://github.com/Ekidio/dawek
 
 ### Sequencer
 - 8 patterns (**A–H**), each 1–4 bars of 16 steps. Chain patterns with **Shift-click**.
-- **DRAW** lanes for per-note values: STEP, VEL, PITCH, FILTER, DECAY, EQ FREQ, EQ GAIN, PAN, SLICE, REVERB and DELAY.
+- **DRAW** lanes for per-note values: STEP, VEL, PITCH, **CHORD**, FILTER, DECAY, EQ FREQ, EQ GAIN, PAN, SLICE, REVERB and DELAY.
+- **CHORD trigger**: in the CHORD lane, click a note and a piano opens over the pads. Click the keys to play one sample as any chord. The chord name (Cm7, F/C …) appears in the grid, with quick chord buttons, octave, inversion and copy / paste.
+- **CHORD MEMORY**: one laptop key = one chord, defaulting to the C-major chords on A S D F G H J K. Store your own chords on keys, play them live and record them.
+- **ROW LENGTH** (PAD EDITOR): a row can be 1–4 bars and repeats until the pattern ends, for example 1-bar drums under a 4-bar bass. Making a pattern shorter never deletes notes: they're kept hidden.
+- **LOOP**: drag on the grid timeline to loop just that part (yellow frame). It snaps to beats; Shift snaps to single steps.
 - **⤢ ZOOM** makes the selected row as tall as a pad. **↑ / ↓** step between rows.
 - **M / S** (mute / solo) on every row. **🎲 RANDOM** writes a new rhythm for the bank, and **🎲 ROW** for a single row (on a slice pad it shuffles the slices).
-- **DOUBLE**, **COPY →**, **CLEAR** and **UNDO**.
+- **DOUBLE** (with a **Shift-click / Shift-drag selection** it duplicates only the selected notes), **COPY →**, **CLEAR**, **UNDO**. Delete / Backspace removes the selected notes.
 - Swing, metronome, count-in and live recording from the pads, the keyboard or MIDI.
 
 ### Mix, export and projects

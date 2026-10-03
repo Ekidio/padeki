@@ -17,7 +17,7 @@ A PADEKI a DAWEKI család tagja ([DAWEKI V3](https://github.com/Ekidio/daweki_v3
 ## Funkciók
 
 ### TAPE: a mintaszerkesztő
-- Húzz egy hangfájlt a TAPE-re (vagy **LOAD**). Görgővel nagyítasz, a kijelölést az **IN / OUT** fogantyúkkal állítod.
+- Húzz egy hangfájlt a TAPE-re (vagy **LOAD**): WAV, MP3, M4A, FLAC, OGG és **AIFF** (Logic és Pro Tools bounce-ok). Görgővel nagyítasz, a kijelölést az **IN / OUT** fogantyúkkal állítod.
 - **CHOP**: az **AUTO** minden tranziensnél markert tesz, vagy vágd **4 / 8 / 16** egyenlő szeletre.
 - A **+HIT / Alt+kattintás** a kattintás körüli ütésekre tesz markert. Mintapontos vágáshoz ott a **SHIFT ALL** és az **IN / OUT ±1 / 5 ms**.
 - **→ PAD**: kattints egy szeletre, aztán egy padra. Vagy használd a **FILL EMPTY PADS** és a **SELECTION → FREE PAD** gombot.
@@ -40,10 +40,14 @@ A PADEKI a DAWEKI család tagja ([DAWEKI V3](https://github.com/Ekidio/daweki_v3
 
 ### Sequencer
 - 8 pattern (**A–H**), mindegyik 1–4 ütem, ütemenként 16 lépéssel. Láncolás **Shift + kattintással**.
-- **DRAW** sávok a hangonkénti értékekhez: STEP, VEL, PITCH, FILTER, DECAY, EQ FREQ, EQ GAIN, PAN, SLICE, REVERB és DELAY.
+- **DRAW** sávok a hangonkénti értékekhez: STEP, VEL, PITCH, **CHORD**, FILTER, DECAY, EQ FREQ, EQ GAIN, PAN, SLICE, REVERB és DELAY.
+- **CHORD trigger**: a CHORD sávban egy hangra kattintva a padok helyén feljön egy zongora. A billentyűkre kattintva egyetlen mintából bármilyen akkordot kirakhatsz. Az akkord neve (Cm7, F/C …) a gridben is látszik. Vannak gyorsgombok, oktáv, fordítás (inversion) és copy / paste.
+- **CHORD MEMORY**: egy laptop-billentyű = egy akkord, alapból C-dúr akkordokkal az A S D F G H J K billentyűkön. Saját akkordokat is tárolhatsz a billentyűkre, élőben játszhatod és felveheted őket.
+- **ROW LENGTH** (PAD EDITOR): egy sor 1–4 ütemes lehet, és ismétlődik, amíg a pattern tart (pl. 1 ütemes dob egy 4 ütemes basszus alatt). A pattern rövidítése nem töröl hangot, csak elrejti őket.
+- **LOOP**: a grid timeline-ján húzással kijelölt rész ismétlődik (sárga keret). Ütésre ugrik, a Shift-tel lépésre pontos.
 - A **⤢ ZOOM** a kijelölt sort pad-magasra nagyítja, a **↑ / ↓** a sorok között léptet.
 - **M / S** (némítás / szóló) minden soron. A **🎲 RANDOM** új ritmust ír a bankra, a **🎲 ROW** csak egy sorra (slice padon a szeleteket keveri).
-- **DOUBLE**, **COPY →**, **CLEAR** és **UNDO**.
+- **DOUBLE** (**Shift + kattintás vagy Shift + húzás** kijelöléssel csak a kijelölt hangokat duplázza), **COPY →**, **CLEAR**, **UNDO**. A Delete / Backspace törli a kijelölt hangokat.
 - Swing, metronóm, előszámlálás és élő felvétel a padokról, a billentyűzetről vagy MIDI-ről.
 
 ### Keverés, export, projektek
