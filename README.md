@@ -12,7 +12,7 @@
 
 It's written in vanilla JavaScript and the Web Audio API. There's nothing to install, no build step and no server. Everything runs in your browser, and your audio never leaves your computer.
 
-PADEKI is part of the DAWEKI family ([DAWEKI V3](https://github.com/Ekidio/daweki_v3)).
+PADEKI is an **EKIDIO SOUND** app. See also: [DAWEKI V3](https://github.com/Ekidio/daweki_v3).
 
 ## Features
 

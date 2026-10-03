@@ -12,7 +12,7 @@ A **PADEKI** egyetlen HTML fájlból álló, böngészőben futó padsampler és
 
 Vanilla JavaScriptben, Web Audio API-val készült. Nincs telepítés, nincs build, nincs szerver. Minden a böngésződben fut, a hanganyag nem hagyja el a gépedet.
 
-A PADEKI a DAWEKI család tagja ([DAWEKI V3](https://github.com/Ekidio/daweki_v3)).
+A PADEKI az **EKIDIO SOUND** alkalmazása. Lásd még: [DAWEKI V3](https://github.com/Ekidio/daweki_v3).
 
 ## Funkciók
 
