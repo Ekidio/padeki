@@ -18,8 +18,9 @@ A PADEKI a DAWEKI család tagja ([DAWEKI V3](https://github.com/Ekidio/daweki_v3
 
 ### TAPE: a mintaszerkesztő
 - Húzz egy hangfájlt a TAPE-re (vagy **LOAD**): WAV, MP3, M4A, FLAC, OGG és **AIFF** (Logic és Pro Tools bounce-ok). Görgővel nagyítasz, a kijelölést az **IN / OUT** fogantyúkkal állítod.
-- **CHOP**: az **AUTO** minden tranziensnél markert tesz, vagy vágd **4 / 8 / 16** egyenlő szeletre.
-- A **+HIT / Alt+kattintás** a kattintás körüli ütésekre tesz markert. Mintapontos vágáshoz ott a **SHIFT ALL** és az **IN / OUT ±1 / 5 ms**.
+- **CHOP**: az **AUTO** minden tranziensnél markert tesz, vagy vágd **4 / 8 / 16 / 32** egyenlő szeletre.
+- A **+HIT / Alt+kattintás** a kattintás körüli ütésekre tesz markert. Az **IN** vagy **OUT** gombra kattintva a TAPE ránagyít arra a markerre, és mintapontosan húzhatod. Újra kattintva visszajön az egész minta. ← / → = 1 ms (Shift = 5 ms), a **SHIFT ALL** az összes markert egyszerre tolja.
+- A minta padokra tett részei a TAPE-en **a pad színét kapják**. Egy pad leütésekor a TAPE megmutatja az IN/OUT kijelölését, és rögtön szerkesztheted.
 - **→ PAD**: kattints egy szeletre, aztán egy padra. Vagy használd a **FILL EMPTY PADS** és a **SELECTION → FREE PAD** gombot.
 - **LOOP → SLICE PAD** (ReCycle / REX elv): az egész loop a szeleteivel együtt **egyetlen padra** kerül. A pad sora a szeleteket az eredeti helyükön játssza. A loop bármilyen tempót követ, a hangmagassága nem változik.
 
@@ -47,7 +48,7 @@ A PADEKI a DAWEKI család tagja ([DAWEKI V3](https://github.com/Ekidio/daweki_v3
 - **LOOP**: a grid timeline-ján húzással kijelölt rész ismétlődik (sárga keret). Ütésre ugrik, a Shift-tel lépésre pontos.
 - A **⤢ ZOOM** a kijelölt sort pad-magasra nagyítja, a **↑ / ↓** a sorok között léptet.
 - **M / S** (némítás / szóló) minden soron. A **🎲 RANDOM** új ritmust ír a bankra, a **🎲 ROW** csak egy sorra (slice padon a szeleteket keveri).
-- **DOUBLE** (**Shift + kattintás vagy Shift + húzás** kijelöléssel csak a kijelölt hangokat duplázza), **COPY →**, **CLEAR**, **UNDO**. A Delete / Backspace törli a kijelölt hangokat.
+- **DOUBLE** (**Shift + kattintás vagy Shift + húzás** kijelöléssel csak a kijelölt hangokat duplázza), **COPY →**, **CLEAR**, **UNDO**. A **RENDER → PAD** azt, amit hallasz (a patternt vagy a LOOP-ot, mute/solo-val és effektekkel), új mintaként egy üres padra rendereli. A Delete / Backspace törli a kijelölt hangokat.
 - Swing, metronóm, előszámlálás és élő felvétel a padokról, a billentyűzetről vagy MIDI-ről.
 
 ### Keverés, export, projektek

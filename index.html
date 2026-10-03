@@ -881,6 +881,15 @@ html[data-variant="modern"] input[type=range]::-webkit-slider-runnable-track{bac
 .seqhead .bars span.inloop{background:rgba(255,212,0,.35);border-radius:2px;opacity:1}
 .loopbox{position:absolute;z-index:3;pointer-events:none;border:3px solid #ffd400;border-radius:6px;box-shadow:0 0 0 1px rgba(0,0,0,.35),0 0 14px rgba(255,212,0,.35);background:rgba(255,212,0,.05)}
 .lanes .btn.loopchip{background:linear-gradient(#ffe04d,#ffc800);color:#222;border-color:#b38f00}
+/* grid toolbar groups: a colored stripe + tiny label per function */
+#laneRow{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+#laneRow .grow1{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:flex-end}
+.bgrp{display:flex;flex-direction:column;gap:2px}
+.bgrp .glbl{font-size:9px;padding-left:2px;margin:0;white-space:nowrap}   /* same color as the skin's other labels (BANK, PATTERN …) */
+.bgrp .gbtns{display:flex;gap:4px;flex-wrap:wrap}
+.bgrp .gbtns .btn{min-height:34px;padding:0 10px;font-size:11.5px;box-shadow:inset 0 3px 0 var(--gc),var(--key-shadow)}
+.g-note{--gc:#ff5a3c}.g-tone{--gc:#f2b21b}.g-space{--gc:#2fb6d9}.g-view{--gc:#9a9aa0}.g-pat{--gc:#7a5cff}.g-edit{--gc:#3fbf6a}.g-make{--gc:#ff3d9a}
+.seg.edge .btn.zoomed{box-shadow:inset 0 0 0 2px var(--red),var(--key-shadow)}
 </style>
 </head>
 <body>
@@ -901,12 +910,11 @@ html[data-variant="modern"] input[type=range]::-webkit-slider-runnable-track{bac
   <section class="tape" id="tape">
     <div class="tapebar">
       <span class="tt" id="tapeTitle">TAPE</span><span class="info" id="tapeInfo"></span>
-      <select id="recentSel"></select>
       <button class="btn kit" id="tapeLoadBtn" data-a="loadTape">LOAD</button><span class="sep"></span>
-      <span class="tt">CHOP</span><button class="btn" data-a="chop" data-n="auto">AUTO</button><button class="btn" data-a="chop" data-n="4">4</button><button class="btn" data-a="chop" data-n="8">8</button><button class="btn" data-a="chop" data-n="16">16</button><button class="btn" data-a="chop" data-n="clear">✕</button><button class="btn on" id="headsBtn" data-a="heads" title="show which slice / where the pads play on the TAPE while the pattern runs">PLAYHEADS</button><button class="btn" id="hitBtn" data-a="hitMode" title="click the wave: markers on the hit before and after the click (Alt+click works any time)">✚ HIT</button>
+      <span class="tt">CHOP</span><button class="btn" data-a="chop" data-n="auto">AUTO</button><button class="btn" data-a="chop" data-n="4">4</button><button class="btn" data-a="chop" data-n="8">8</button><button class="btn" data-a="chop" data-n="16">16</button><button class="btn" data-a="chop" data-n="32">32</button><button class="btn" id="hitBtn" data-a="hitMode" title="click the wave: markers on the hit before and after the click (Alt+click works any time)">✚ HIT</button><button class="btn" data-a="chop" data-n="clear" title="remove all markers">✕</button><span class="sep"></span><button class="btn on" id="headsBtn" data-a="heads" title="show which slice / where the pads play on the TAPE while the pattern runs">PLAYHEADS</button>
       <span class="tt" title="move every slice marker together">SHIFT ALL</span><button class="btn" data-a="shiftMarks" data-d="-5">◀◀ 5ms</button><button class="btn" data-a="shiftMarks" data-d="-1">◀ 1ms</button><button class="btn" data-a="shiftMarks" data-d="1">1ms ▶</button><button class="btn" data-a="shiftMarks" data-d="5">5ms ▶▶</button>
       <span class="sep"></span><button class="btn" data-a="fillPads">FILL EMPTY PADS</button><button class="btn" data-a="toPad">SELECTION → FREE PAD</button><button class="btn slbtn" data-a="loopSlice" title="the whole selection on ONE pad, sliced at the markers (like ReCycle / REX) – its row plays the slices, at any tempo">LOOP → SLICE PAD</button>
-      <span class="sep"></span><button class="btn" data-a="tapeZoom" data-z="2">−</button><button class="btn" data-a="tapeZoom" data-z="0.5">+</button><button class="btn" data-a="tapeSel">SEL</button><button class="btn" data-a="tapeAll">ALL</button>
+      <span class="sep"></span><button class="btn" data-a="tapeAll" title="show the whole sample (wheel = zoom)">ALL</button>
     </div>
     <div class="tapewrap"><canvas id="tapeCv"></canvas><canvas id="tapeOv"></canvas></div>
     <div class="tapebar selbar" id="selBar"></div>
@@ -2307,6 +2315,35 @@ async function freshStart(demo) {
   if (demo) await applyDemo();
   applyMaster(); applyGraph(A.G); dirty(); renderAll();
 }
+/* RENDER → PAD: what you hear (current pattern or its LOOP range, mute / solo, sends and FX) becomes a new sample on an empty pad */
+async function renderToPad() {
+  const slot = S.slot, sl = S.slots[slot], r = loopOf(slot) || { a: 0, b: slotLen(slot) }, steps = r.b - r.a, events = [];
+  for (let k = 0; k < steps; k++) {
+    const local = r.a + k;
+    for (const n of sl.notes) { const rl = rowSteps(sl, n.p); if (n.s < rl && n.s === local % rl && audible(n.p)) events.push({ n, tick: k * STEP + swingTick(local) }); }
+  }
+  if (!events.length) { toast('Nothing to render – this pattern (or the soloed rows) has no notes'); return; }
+  let i = S.pads.findIndex((p, k) => (k >> 4) === S.bank && !p.src); if (i < 0) i = S.pads.findIndex(p => !p.src);
+  if (i < 0) { toast('No empty pad left – clear a pad or a bank first'); return; }
+  toast('Rendering to pad…', 10000);
+  const PRE = 1, LAT = 0.006, spt = 60 / (S.bpm * PPQ), sr = 44100, len = steps * STEP * spt;
+  const oc = new OfflineAudioContext(2, Math.ceil((len + 3 + PRE + LAT) * sr), sr);
+  const bus = oc.createGain(), lim = makeLimiter(oc); bus.connect(lim).connect(oc.destination);       // no master volume (the pad goes through it again), limiter only as a safety
+  const G = makeGraph(oc, bus), chk = {};
+  events.sort((x, y) => x.tick - y.tick).forEach(e => playPad(oc, G, e.n.p, e.n, PRE + e.tick * spt, chk, false));
+  const raw = await oc.startRendering(), cut = Math.round((PRE + LAT) * sr), n = Math.round(len * sr);
+  const buf = new AudioBuffer({ length: n, numberOfChannels: 2, sampleRate: sr });
+  for (let c = 0; c < 2; c++) {                                          // exact loop length, the reverb / delay tail wraps to the start = seamless when it loops
+    const src = raw.getChannelData(c).subarray(cut), d = buf.getChannelData(c); d.set(src.subarray(0, n));
+    for (let j = n; j < src.length; j++) d[(j - n) % n] += src[j];
+  }
+  const name = `RENDER ${SLOT_NAMES[slot]}` + (loopOf(slot) ? ' LOOP' : ''), src = addSample(buf, name);
+  Object.assign(S.pads[i], newPad(), { name, src }); S.recent.unshift({ src, name }); S.recent = S.recent.slice(0, 8);
+  if ((i >> 4) !== S.bank) S.bank = i >> 4;
+  S.sel = i; dirty(); renderPads(); renderSeq(); renderKnobs(); renderTape();
+  const solo = S.pads.some(p => p.solo), muted = S.pads.some(p => p.mute);
+  toast(`${name} → ${padLabel2(i)} · ${(len).toFixed(2)} s${solo ? ' · only the soloed rows' : muted ? ' · without the muted rows' : ''} – SHOW ON TAPE to chop it`, 3200);
+}
 async function exportWav(loops) {
   const st = { ci: 0, segK: 0, slot: S.chain[0] ?? S.slot, queued: null };
   const total = S.chain.reduce((a, k) => a + slotLen(k), 0) * loops * STEP, events = [];
@@ -2407,6 +2444,15 @@ function assignToPad(i, src, a, b, name) {
   ensureAudio(); playPad(ctx, A.G, i, { v: 110 }, ctx.currentTime, liveChoke, true);
   toast(`→ ${padLabel2(i)}`, 900);
 }
+/* hitting a pad whose sample is on the TAPE shows ITS IN / OUT there (markers stay, the pad becomes the one you edit) */
+function followPadOnTape(i) {
+  const pd = S.pads[i]; if (!pd?.src || pd.sl || UI.send || !tapeBuf() || !sameSrc(pd.src, S.tape.src)) return;
+  if (UI.link === i && S.tape.a === pd.a && S.tape.b === pd.b) return;
+  S.tape.a = pd.a; S.tape.b = pd.b; UI.link = i; UI.edgeZoom = null;
+  const k = segments().findIndex(([a, b]) => Math.abs(a - pd.a) < 1e-6 && Math.abs(b - pd.b) < 1e-6); UI.selSeg = k >= 0 ? k : null;
+  const span = UI.v1 - UI.v0; if (span < 0.999 && (pd.a < UI.v0 || pd.b > UI.v1)) tapeView((pd.a + pd.b) / 2 - span / 2, span);   // keep the zoom, bring the part into view
+  renderTape(); renderSelBar();
+}
 function showPadOnTape(i) {
   const pd = S.pads[i]; if (!pd.src) return;
   setTape(pd.src, pd.name || padLabel2(i), pd.a, pd.b, i);
@@ -2445,15 +2491,24 @@ function drawTape() {
   g.globalAlpha = 0.4; g.fillStyle = ov; g.fillRect(0, top, Math.max(0, X(t.a)), wh); g.fillRect(X(t.b), top, w - X(t.b), wh); g.globalAlpha = 1;
   // wave
   const d = buf.getChannelData(0), n = d.length, spp = span * n / w, s0 = v0 * n;
-  const wc = UI.link != null && S.pads[UI.link]?.src ? padWaveCol(UI.link, css('--lcd-a'), fg) : fg;   // a pad on the TAPE = the pad's own color
-  g.globalAlpha = 1; g.fillStyle = wc; g.strokeStyle = wc; g.lineWidth = dpr;
-  if (spp >= 1) {
-    for (let x = 0; x < w; x++) {
-      const i0 = Math.floor(s0 + x * spp), i1 = Math.min(n, Math.floor(s0 + (x + 1) * spp) + 1), st = Math.max(1, Math.ceil((i1 - i0) / 64));
-      let mn = 1, mx = -1; for (let i = i0; i < i1; i += st) { const v = d[i]; if (v < mn) mn = v; if (v > mx) mx = v; }
-      if (mx >= mn) g.fillRect(x, top + (1 - mx) * wh / 2, 1, Math.max(1, (mx - mn) * wh / 2));
-    }
-  } else { g.beginPath(); for (let x = 0; x < w; x++) { const i = Math.min(n - 1, Math.floor(s0 + x * spp)), y = top + (1 - d[i]) * wh / 2; x ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); }
+  const wc = fg;                                                        // pads color their own parts below (the edited pad included)
+  const wave = (col, x0 = 0, x1 = w) => {
+    g.globalAlpha = 1; g.fillStyle = col; g.strokeStyle = col; g.lineWidth = dpr; x0 = Math.max(0, Math.floor(x0)); x1 = Math.min(w, Math.ceil(x1));
+    if (spp >= 1) {
+      for (let x = x0; x < x1; x++) {
+        const i0 = Math.floor(s0 + x * spp), i1 = Math.min(n, Math.floor(s0 + (x + 1) * spp) + 1), st = Math.max(1, Math.ceil((i1 - i0) / 64));
+        let mn = 1, mx = -1; for (let i = i0; i < i1; i += st) { const v = d[i]; if (v < mn) mn = v; if (v > mx) mx = v; }
+        if (mx >= mn) g.fillRect(x, top + (1 - mx) * wh / 2, 1, Math.max(1, (mx - mn) * wh / 2));
+      }
+    } else { g.beginPath(); for (let x = x0; x < x1; x++) { const i = Math.min(n - 1, Math.floor(s0 + x * spp)), y = top + (1 - d[i]) * wh / 2; x > x0 ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); }
+  };
+  wave(wc);
+  // parts of this sample that sit on pads are painted in the pad's color (other banks first, the current bank on top)
+  if (t.src) {
+    const bg = css('--lcd-a'), own = S.pads.map((pd, i) => ({ pd, i })).filter(({ pd, i }) => pd.src && (!pd.sl || i === UI.link) && sameSrc(pd.src, t.src))
+      .sort((p, q) => ((p.i >> 4) === S.bank) - ((q.i >> 4) === S.bank));
+    for (const { pd, i } of own) { const a = pd.a, b = pd.b; if (X(b) > 0 && X(a) < w) wave(padWaveCol(i, bg, fg), X(a), X(b) + 1); }
+  }
   // markers, handles, grab tab
   segs.forEach(([a], k) => { const x = Math.round(X(a)); g.fillStyle = fg; g.fillRect(x - dpr * 0.5, top, dpr, wh); g.fillText(String(k + 1), x + 4 * dpr, h - 6 * dpr); });
   [[t.a, 'IN'], [t.b, 'OUT']].forEach(([m, lab], k) => {
@@ -2562,9 +2617,9 @@ function selInfoHtml() {
   const k = UI.selSeg, isSlice = k != null && t.marks.length > 1;
   return `<span class="tt">${isSlice ? `SLICE <b>${k + 1}</b>` : 'SELECTION'}</span>
     <span class="info" style="flex:0 1 auto">${(t.a * buf.duration).toFixed(3)} → ${(t.b * buf.duration).toFixed(3)} s · ${((t.b - t.a) * buf.duration * 1000).toFixed(1)} ms</span>
-    <span class="sep"></span><span class="seg edge">${[['a', 'IN'], ['b', 'OUT']].map(([e, l]) => `<button class="btn ${(UI.edge || 'a') === e ? 'on' : ''}" data-a="edge" data-e="${e}">${l}</button>`).join('')}</span>${[-5, -1, 1, 5].map(d => `<button class="btn" data-a="selNudge" data-d="${d}">${NUDGE_LBL[d]}</button>`).join('')}
+    <span class="sep"></span><span class="seg edge">${[['a', 'IN'], ['b', 'OUT']].map(([e, l]) => `<button class="btn ${(UI.edge || 'a') === e ? 'on' : ''} ${UI.edgeZoom === e ? 'zoomed' : ''}" data-a="edge" data-e="${e}" title="click = zoom onto the ${l} marker and drag it · again = whole sample · ← / → = 1 ms, Shift = 5 ms">${l}${UI.edgeZoom === e ? ' 🔍' : ''}</button>`).join('')}</span>
     <span class="sep"></span><button class="btn" data-a="tapePlay">▶ PLAY</button><button class="btn send ${UI.send ? 'on' : ''}" data-a="send" title="then click a pad · Esc = stop">${UI.send ? '→ PAD: CLICK A PAD' : '→ PAD'}</button>
-    <span class="info">${isSlice ? 'pick IN or OUT, then nudge · ← / → = 1 ms, Shift = 5 ms' : 'tap a slice to select it'}</span>`;
+    <span class="info">${UI.edgeZoom ? 'drag the marker · ← / → = 1 ms, Shift = 5 ms · click again = whole sample' : isSlice ? 'IN / OUT = zoom onto the marker' : 'tap a slice to select it'}</span>`;
 }
 /* SEND: click a pad to put the tape selection on it; with slices it walks on to the next slice */
 function setSend(on) {
@@ -2610,10 +2665,11 @@ function tapeDown(e) {
   try { e.target.setPointerCapture(e.pointerId); } catch (er) {}
   const t = T(), { r, px, y, h } = tapeX(e), th = 14 / px * (UI.v1 - UI.v0), inSel = r >= t.a && r <= t.b;
   const da = Math.abs(r - t.a), db = Math.abs(r - t.b);
+  if (UI.edgeZoom && y > 18) { TP = { id: e.pointerId, kind: UI.edgeZoom }; setSelEdge(UI.edgeZoom, r); linkedUpdate(); drawTape(); renderTapeInfo(); return; }   // zoomed on IN / OUT: click or drag anywhere moves that marker
   if (Math.min(da, db) < th && y > 18) { TP = { id: e.pointerId, kind: da <= db ? 'a' : 'b' }; return; }
   if (UI.hitMode || e.altKey) { TP = { id: e.pointerId, kind: 'hit', r }; return; }
   const segs = segments(), seg = segs.findIndex(([a, b]) => r >= a && r < b);
-  if (seg >= 0 && !e.shiftKey) { TP = { id: e.pointerId, kind: 'seg', seg, x0: e.clientX, y0: e.clientY }; UI.selSeg = seg; t.a = segs[seg][0]; t.b = segs[seg][1]; linkedUpdate(); drawTape(); return; }
+  if (seg >= 0 && !e.shiftKey && !UI.edgeZoom) { TP = { id: e.pointerId, kind: 'seg', seg, x0: e.clientX, y0: e.clientY }; UI.selSeg = seg; t.a = segs[seg][0]; t.b = segs[seg][1]; linkedUpdate(); drawTape(); return; }
   if (inSel) TP = { id: e.pointerId, kind: 'inside', x0: e.clientX, y0: e.clientY, grab: y > h - 40 };
   else TP = { id: e.pointerId, kind: 'new', anchor: r, moved: false, from: { a: t.a, b: t.b } };
 }
@@ -2664,6 +2720,7 @@ function tapeUp(e) {
   dirty(); renderTapeInfo(); renderSelBar(); tapePlay(t.a, t.b);
 }
 function tapeWheel(e) {
+  if (UI.edgeZoom) { UI.edgeZoom = null; renderSelBar(); }
   if (!e.target.closest('#tapeCv') || !tapeBuf()) return;
   e.preventDefault();
   const span = UI.v1 - UI.v0;
@@ -2691,7 +2748,6 @@ function renderTape() {
   const hb = $('#headsBtn'); if (hb) hb.classList.toggle('on', S.tapeHeads !== false);
   $('#tapeLoadBtn')?.classList.toggle('blink', !tapeBuf());          // empty TAPE: LOAD calls for attention like LOAD KIT
   $('#tapeTitle').innerHTML = UI.link != null ? `EDITING PAD <b>${padLabel2(UI.link)}</b> · ${esc(S.pads[UI.link].name)}` : `TAPE · <b>${esc(S.tape.name || 'EMPTY')}</b>`;
-  $('#recentSel').innerHTML = `<option value="">RECENT…</option>` + S.recent.map((r, k) => `<option value="${k}">${esc(r.name)}</option>`).join('');
   renderTapeInfo(); requestAnimationFrame(drawTape);
 }
 function bankCounts(slot = S.slot) { const c = BANKS.map(() => 0); S.slots[slot].notes.forEach(n => c[n.p >> 4]++); return c; }
@@ -2721,7 +2777,7 @@ function renderPads() {
     const i = b * 16 + r * 4 + c, pd = S.pads[i];
     h += `<div class="pad2 ${pd.src ? '' : 'empty'} ${i === S.sel ? 'sel' : ''}" data-i="${i}" style="--c:${padCol(i)}"><span class="pn">${padLabel2(i)}</span><span class="pk">${HAS_KB ? keyHint(i) : ''}</span><canvas></canvas>${curSlot().len?.[i] ? `<span class="plen">${curSlot().len[i]}B</span>` : ''}<span class="pl">${pd.src ? esc(pd.name) : 'drop here'}</span></div>`;
   }
-  $('#pads2').innerHTML = h;
+  $('#pads2').innerHTML = h; requestAnimationFrame(drawTape);          // the TAPE shows which parts are on pads
   requestAnimationFrame(() => { for (let n = 0; n < 16; n++) drawPadThumb(b * 16 + n); });
 }
 function drawPadThumb(i) {
@@ -2787,10 +2843,14 @@ function laneVal(lane, n, pd) { const L = LANES.find(x => x.id === lane); return
 function renderSeq() {
   if (!LANES.some(l => l.id === S.lane)) S.lane = 'step';          // e.g. an old project saved on the removed CHANCE lane
   const sl = curSlot(), len = sl.bars * SPB, b = S.bank, lane = LANES.find(x => x.id === S.lane);
-  $('#laneRow').innerHTML = `<span class="lbl">DRAW</span>${LANES.map(l => `<button class="btn ${S.lane === l.id ? 'on' : ''}" data-a="lane" data-l="${l.id}">${l.label}</button>`).join('')}<button class="btn zoombtn ${UI.zoom ? 'on' : ''}" data-a="zoom" title="ZOOM: the selected pad's row gets as tall as a pad, the others shrink (↑ / ↓ = previous / next row)">⤢ ZOOM</button>
-    <span class="sep"></span><span class="lbl">PATTERN ${SLOT_NAMES[S.slot]} · BARS${hiddenCount(sl) ? ` <b class="hidn" title="notes past the end are kept – make the pattern / row longer to hear them">+${hiddenCount(sl)} hidden</b>` : ''}</span>${[1, 2, 3, 4].map(n => `<button class="btn ${sl.bars === n ? 'on' : ''}" data-a="bars" data-n="${n}">${n}</button>`).join('')}
-    ${loopOf(S.slot) ? `<button class="btn loopchip on" data-a="loopOff" title="click = loop off (or click the timeline)">LOOP ${(l => `${Math.floor(l.a / 16) + 1}.${Math.floor(l.a % 16 / 4) + 1} – ${Math.floor((l.b - 1) / 16) + 1}.${Math.floor((l.b - 1) % 16 / 4) + 1}`)(loopOf(S.slot))} ✕</button>` : ''}<span class="sep"></span><button class="btn" data-a="double" ${sl.bars > 2 && !UI.selN?.size ? 'disabled' : ''} title="Shift-click / Shift-drag notes to select them – DOUBLE then copies only them right after themselves">DOUBLE${UI.selN?.size ? ' ' + UI.selN.size : ''}</button><button class="btn" data-a="copySlot">COPY →</button><button class="btn" data-a="clearSlot">CLEAR</button><button class="btn" data-a="undo">UNDO</button>
-    <span class="sep"></span><button class="btn" data-a="rand" title="new rhythm for all sounds of this bank (UNDO brings the old one back)">🎲 RANDOM</button><button class="btn" data-a="randRow" title="new rhythm only for the selected pad">🎲 ROW</button>`;
+  const LG = { step: 'note', vel: 'note', pitch: 'note', chord: 'note', slice: 'note', cut: 'tone', decay: 'tone', eqf: 'tone', eqg: 'tone', pan: 'space', rev: 'space', dly: 'space' };
+  const laneBtn = id => { const l = LANES.find(x => x.id === id); return l ? `<button class="btn ${S.lane === l.id ? 'on' : ''}" data-a="lane" data-l="${l.id}">${l.label}</button>` : ''; };
+  const group = (cls, label, inner) => `<span class="bgrp g-${cls}"><span class="lbl glbl">${label}</span><span class="gbtns">${inner}</span></span>`;
+  const lanesOf = g => LANES.filter(l => LG[l.id] === g).map(l => laneBtn(l.id)).join('');
+  $('#laneRow').innerHTML = `<div class="grow1">${group('note', 'NOTE', lanesOf('note'))}${group('tone', 'TONE', lanesOf('tone'))}${group('space', 'SPACE', lanesOf('space'))}${group('view', 'VIEW', `<button class="btn zoombtn ${UI.zoom ? 'on' : ''}" data-a="zoom" title="ZOOM: the selected pad's row gets as tall as a pad, the others shrink (↑ / ↓ = previous / next row)">⤢ ZOOM</button>`)}</div>
+    <div class="grow1">${group('pat', `PATTERN ${SLOT_NAMES[S.slot]}${hiddenCount(sl) ? ` <b class="hidn" title="notes past the end are kept – make the pattern / row longer to hear them">+${hiddenCount(sl)} hidden</b>` : ''}`, `${[1, 2, 3, 4].map(n => `<button class="btn ${sl.bars === n ? 'on' : ''}" data-a="bars" data-n="${n}" title="${n} bar${n > 1 ? 's' : ''}">${n}</button>`).join('')}${loopOf(S.slot) ? `<button class="btn loopchip on" data-a="loopOff" title="click = loop off (or click the timeline)">LOOP ${(l => `${Math.floor(l.a / 16) + 1}.${Math.floor(l.a % 16 / 4) + 1} – ${Math.floor((l.b - 1) / 16) + 1}.${Math.floor((l.b - 1) % 16 / 4) + 1}`)(loopOf(S.slot))} ✕</button>` : ''}`)}
+      ${group('edit', 'EDIT', `<button class="btn" data-a="double" ${sl.bars > 2 && !UI.selN?.size ? 'disabled' : ''} title="Shift-click / Shift-drag notes to select them – DOUBLE then copies only them right after themselves">DOUBLE${UI.selN?.size ? ' ' + UI.selN.size : ''}</button><button class="btn" data-a="copySlot">COPY →</button><button class="btn" data-a="clearSlot">CLEAR</button><button class="btn" data-a="undo">UNDO</button>`)}
+      ${group('make', 'CREATE', `<button class="btn" data-a="rand" title="new rhythm for all sounds of this bank (UNDO brings the old one back)">🎲 RANDOM</button><button class="btn" data-a="randRow" title="new rhythm only for the selected pad">🎲 ROW</button><button class="btn rtp" data-a="renderPad" title="render what you hear (this pattern or its LOOP, mute / solo, FX) onto an empty pad">RENDER → PAD</button>`)}</div>`;
   const cols = `grid-template-columns:${Array.from({ length: sl.bars }, () => 'repeat(16,minmax(0,1fr))').join(' 6px ')}`, gap = '<i class="bgap"></i>';
   let h = `<div class="seqhead"><span></span><div class="bars" style="${cols}">${Array.from({ length: len }, (_, s) => `${s > 0 && s % 16 === 0 ? gap : ''}<span data-x="${s}">${s % 16 === 0 ? 'BAR ' + (s / 16 + 1) : s % 4 === 0 ? (s % 16) / 4 + 1 : ''}</span>`).join('')}</div></div>`;
   const byPad = {}; sl.notes.forEach(n => { if (n.s < rowSteps(sl, n.p)) (byPad[n.p] || (byPad[n.p] = {}))[n.s] = n; });
@@ -3058,6 +3118,7 @@ const ACT = {
     toast(n ? `${padLabel2(S.sel)} plays ${n} bar${n > 1 ? 's' : ''} and repeats` + (sl.bars > n ? ` (×${sl.bars / n} in the ${sl.bars}-bar pattern)` : '') : `${padLabel2(S.sel)} follows the pattern length`, 1800);
   },
   loopOff: () => { S.loop = null; dirty(); renderSeq(); toast('LOOP off', 800); },
+  renderPad: () => { ensureAudio(); renderToPad(); },
   bank: el => { S.bank = +el.dataset.b; S.sel = S.bank * 16 + (S.sel & 15); renderPads(); renderSeq(); renderKnobs(); },
   kitMenu: () => {
     const btns = list => `<div class="kitmenu">${list.map(k => `<button class="btn" data-a="loadKit" data-k="${k}">${KITS[k].name}</button>`).join('')}</div>`;
@@ -3093,7 +3154,7 @@ const ACT = {
   },
   tapeZoom: el => { const t = T(); tapeZoomAt((t.a + t.b) / 2, +el.dataset.z); },
   tapeSel: () => { const t = T(), pad = (t.b - t.a) * 0.08; tapeView(t.a - pad, t.b - t.a + 2 * pad); },
-  tapeAll: () => tapeView(0, 1),
+  tapeAll: () => { UI.edgeZoom = null; tapeView(0, 1); renderSelBar(); },
   tapePlay: () => { if (tapePrev) tapeStopPreview(); else tapePlay(T().a, T().b); },
   send: () => setSend(!UI.send),
   heads: el => {
@@ -3102,7 +3163,13 @@ const ACT = {
     dirty(); toast(S.tapeHeads ? 'TAPE shows the pads while playing' : 'TAPE playheads off while playing (▶ PLAY still shows its own)', 1800);
   },
   hitMode: () => { UI.hitMode = !UI.hitMode; $('#hitBtn').classList.toggle('on', UI.hitMode); toast(UI.hitMode ? 'HIT: click the wave – markers go on the hits left and right of the click' : 'HIT off', 1800); },
-  edge: el => { UI.edge = el.dataset.e; renderSelBar(); },
+  edge: el => {                                                        // IN / OUT: zoom onto that marker (≈80 ms) to drag it precisely; click again = whole sample
+    const e = el.dataset.e, t = T(), buf = tapeBuf(); UI.edge = e;
+    if (!buf) { renderSelBar(); return; }
+    if (UI.edgeZoom === e) { UI.edgeZoom = null; tapeView(0, 1); }
+    else { UI.edgeZoom = e; const span = Math.min(1, 0.08 / buf.duration), m = e === 'a' ? t.a : t.b; tapeView(m - span / 2, span); }
+    renderSelBar();
+  },
   selNudge: el => {
     const t = T(), buf = tapeBuf(); if (!buf) return;
     const d = +el.dataset.d / 1000 / buf.duration, e = el.dataset.e || UI.edge || 'a';
@@ -3224,7 +3291,7 @@ function bindUI() {
     else if (e.target.closest('.pad2')) {
       e.preventDefault(); const el = e.target.closest('.pad2'), i = +el.dataset.i, r = el.getBoundingClientRect();
       if (UI.send) { sendToPad(i); return; }
-      selectPad(i); hitPad(i, Math.round(clamp(127 - (e.clientY - r.top) / r.height * 80, 30, 127)));
+      selectPad(i); hitPad(i, Math.round(clamp(127 - (e.clientY - r.top) / r.height * 80, 30, 127))); followPadOnTape(i);
       UI.lp = { id: e.pointerId, x: e.clientX, y: e.clientY, t: setTimeout(() => { UI.lp = null; openPadEditor(i); }, 480) };
     } else if (e.target.closest('.shead .ms')) { /* M / S buttons: handled by click */
     } else if (e.target.closest('.shead')) { const i = +e.target.closest('.shead').dataset.i; if (UI.send) { sendToPad(i); return; } selectPad(i); if (S.pads[i].src) hitPad(i, 110); }
@@ -3282,7 +3349,7 @@ function bindUI() {
       return;
     }
     const n = KEYS[e.code]; if (n == null || e.repeat) return;
-    const i = S.bank * 16 + n; selectPad(i); hitPad(i, 110);
+    const i = S.bank * 16 + n; selectPad(i); hitPad(i, 110); followPadOnTape(i);
   });
   document.addEventListener('visibilitychange', () => { if (document.hidden) autosave(); });
   window.addEventListener('resize', () => { renderChordPanel(); drawLoop(); drawTape(); for (let n = 0; n < 16; n++) drawPadThumb(S.bank * 16 + n); });

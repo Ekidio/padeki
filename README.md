@@ -18,8 +18,9 @@ PADEKI is part of the DAWEKI family ([DAWEKI V3](https://github.com/Ekidio/dawek
 
 ### TAPE: the sample editor
 - Drop an audio file onto the TAPE (or use **LOAD**): WAV, MP3, M4A, FLAC, OGG and **AIFF** (Logic / Pro Tools bounces). Zoom with the wheel and set the selection with the **IN / OUT** handles.
-- **CHOP**: **AUTO** puts a marker on every transient, or split the loop into **4 / 8 / 16** equal slices.
-- **+HIT / Alt-click** adds markers on the hits around the click. Use **SHIFT ALL** and the **IN / OUT ±1 / 5 ms** buttons for sample-accurate trimming.
+- **CHOP**: **AUTO** puts a marker on every transient, or split the loop into **4 / 8 / 16 / 32** equal slices.
+- **+HIT / Alt-click** adds markers on the hits around the click. Click **IN** or **OUT** to zoom onto that marker and drag it sample-accurately; click again to see the whole sample. ← / → nudge 1 ms (Shift = 5 ms), and **SHIFT ALL** moves every marker at once.
+- Parts of the sample that are on pads are **colored in the pad's color** on the TAPE. Hitting a pad shows its IN / OUT on the TAPE, ready to edit.
 - **→ PAD**: click a slice, then click a pad. Or use **FILL EMPTY PADS** and **SELECTION → FREE PAD**.
 - **LOOP → SLICE PAD** (ReCycle / REX style): puts the whole loop, with its slices, on **one pad**. The pad's row plays the slices at their original places. The loop follows any tempo and its pitch doesn't change.
 
@@ -47,7 +48,7 @@ PADEKI is part of the DAWEKI family ([DAWEKI V3](https://github.com/Ekidio/dawek
 - **LOOP**: drag on the grid timeline to loop just that part (yellow frame). It snaps to beats; Shift snaps to single steps.
 - **⤢ ZOOM** makes the selected row as tall as a pad. **↑ / ↓** step between rows.
 - **M / S** (mute / solo) on every row. **🎲 RANDOM** writes a new rhythm for the bank, and **🎲 ROW** for a single row (on a slice pad it shuffles the slices).
-- **DOUBLE** (with a **Shift-click / Shift-drag selection** it duplicates only the selected notes), **COPY →**, **CLEAR**, **UNDO**. Delete / Backspace removes the selected notes.
+- **DOUBLE** (with a **Shift-click / Shift-drag selection** it duplicates only the selected notes), **COPY →**, **CLEAR**, **UNDO**. **RENDER → PAD** renders what you hear (this pattern or its LOOP, with mute / solo and FX) onto an empty pad as a new sample. Delete / Backspace removes the selected notes.
 - Swing, metronome, count-in and live recording from the pads, the keyboard or MIDI.
 
 ### Mix, export and projects
